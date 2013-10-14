@@ -1,0 +1,7 @@
+.bundle
+tmp/
+!tmp/pids
+tmp/pids/*
+log/
+.env*
+.ruby-version
