@@ -1,6 +1,7 @@
 class CreateApps < ActiveRecord::Migration
   def up
     create_table :apps do |t|
+      t.string    :short_id
       t.string    :email 
       t.string    :app_name 
       t.string    :secret_api_key 

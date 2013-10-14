@@ -2,6 +2,7 @@ class CreateLogins < ActiveRecord::Migration
   def up
     create_table :logins do |t|
       t.integer   :app_id
+      t.integer   :identity_id
       t.string    :email 
       t.string    :authcode 
       t.string    :status

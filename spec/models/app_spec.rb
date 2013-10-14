@@ -17,6 +17,12 @@ describe App do
     it { app.should_not be_valid }
   end
 
+  context "app_name has spaces" do
+    before { app.app_name = "Some Spaces And Capitals" }
+
+    it { app.should_not be_valid }
+  end
+
   context "app_name already exists" do
     let(:app2) { FactoryGirl.build(:app) }
 
@@ -44,5 +50,6 @@ describe App do
 
     it { app.secret_api_key.should_not be_blank }
     it { app.public_api_key.should_not be_blank }
+    it { app.short_id.should_not be_blank }
   end
 end

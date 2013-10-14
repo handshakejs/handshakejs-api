@@ -1,10 +1,12 @@
 class App < ActiveRecord::Base
   has_many :logins
+  has_many :identities
 
-  validates :email, presence: true, uniqueness: true 
-  validates :app_name, presence: true, uniqueness: true
+  validates :email, presence: true
+  validates :app_name, presence: true, uniqueness: true, format: { with: /\A[a-z0-9]+\z/ }
 
   before_save       :set_api_keys
+  before_save       :set_short_id
 
   private
 
@@ -19,5 +21,9 @@ class App < ActiveRecord::Base
 
   def random_public_api_key
     ["pk_", SecureRandom.hex(15)].join
+  end
+
+  def set_short_id
+    self.short_id = short_id || ["APP_", Shorty.next_short_id(App)].join
   end
 end

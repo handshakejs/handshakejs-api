@@ -11,13 +11,13 @@ describe "/api/v0" do
   let(:json)  { JSON.parse(body) }
 
   context "not requiring authorization" do
-    describe "POST /apps" do
+    describe "POST /apps/create" do
       let(:email)     { "scott@mailinator.com" }
       let(:app_name)  { "mailinator" }
       let(:params)    { {email: email, app_name: app_name} }
 
       before do
-        post "/apps.json", params, format: 'json'
+        post "/apps/create.json", params, format: 'json'
       end
 
       context "valid email and password" do
@@ -39,6 +39,76 @@ describe "/api/v0" do
 
       context "missing app_name" do
         let(:app_name)   { "" }
+
+        it do
+          json['success'].should eq false
+          json['error']['message'].should_not be_blank
+        end
+      end
+    end
+
+    describe "POST /login/request" do
+      let!(:factory_app)  { FactoryGirl.create(:app) }
+      let(:email)         { "attempt1@mailinator.com" }
+      let(:app_name)      { factory_app.app_name }
+      let(:params)        { {email: email, app_name: app_name } }
+
+      before do
+        post "/login/request.json", params, format: 'json'
+      end
+
+      context "valid app_name" do
+        it do
+          json['success'].should eq true
+          json['login']['email'].should eq email
+          json['login']['app_name'].should eq app_name
+          Login.last.authcode.should_not be_blank
+        end
+
+      end
+
+      context "invalid app_name" do
+        let(:app_name) { "doesnotexist" }
+
+        it do
+          json['success'].should eq false
+        end
+      end
+    end
+
+    describe "POST /login/confirm" do
+      let!(:login)        { FactoryGirl.create(:login) }
+      let(:email)         { login.email }
+      let(:authcode)      { login.authcode }
+      let(:app_name)      { login.app.app_name }
+      let(:params)        { {email: email, app_name: app_name, authcode: authcode } }
+
+      before do
+        post "/login/confirm.json", params, format: 'json'
+      end
+
+      context "valid authcode" do
+        it do
+          json['success'].should eq true
+          Login.last.should be_confirmed
+        end
+      end
+
+
+      context "valid authcode but having already been confirmed" do
+        before do
+          login.mark_confirmed!
+          post "/login/confirm.json", params, format: 'json'
+        end
+
+        it do
+          json['success'].should eq false
+          json['error']['message'].should eq "Sorry, this authcode has already been used with this email."
+        end
+      end
+
+      context "invalid authcode" do
+        let(:authcode) { "doesnotexist" }
 
         it do
           json['success'].should eq false

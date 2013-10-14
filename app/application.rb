@@ -1,10 +1,9 @@
 class Application < Sinatra::Base
   register Sinatra::ActiveRecordExtension
-  use Raven::Rack
   
-  # enable :raise_errors
-  disable :show_exceptions
-  disable :raise_errors
+  enable :raise_errors
+  #disable :show_exceptions
+  #disable :raise_errors
 
   configure do
     set :database, DATABASE_URL
@@ -34,7 +33,7 @@ class Application < Sinatra::Base
   end
   
   get "/" do
-    File.read(File.join('public', 'index.html'))
+    redirect "/api/v0"
   end
 
   get "/exception" do

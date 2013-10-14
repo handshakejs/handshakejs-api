@@ -1,0 +1,9 @@
+json.success true
+json.login do
+  json.email    @login.email
+  json.app_name @login.app.app_name
+end
+json.identity do
+  json.id       @login.identity.short_id
+  json.email    @login.identity.email
+end
