@@ -28,7 +28,10 @@ heroku run rake db:migrate
 Next, create your first app.
 
 ```bash
-curl -X POST https://emailauth.herokuapp.com/api/v0/apps.json
+curl -X POST https://emailauth.herokuapp.com/api/v0/apps/create.json \
+-d "email=you@email.com" \
+-d "app_name=myappname"
+```
 
 ## Summary
 
