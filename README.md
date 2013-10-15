@@ -33,6 +33,12 @@ curl -X POST https://emailauth.herokuapp.com/api/v0/apps/create.json \
 -d "app_name=myappname"
 ```
 
+Nice, that's all it takes to get your authentication system running. Now let's plug that into our app using the embeddable JavaScript.
+
+
+
+
+
 ## Summary
 
 ### API Endpoint
@@ -69,7 +75,7 @@ curl -X POST https://emailauth.herokuapp.com/api/v0/apps/create.json -d "email=t
 {
   success: true,
   app: {
-    id: "1",
+    id: "APP_123453423784",
     email: "test@example.com",
     app_name: "myapp"
   }
