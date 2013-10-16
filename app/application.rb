@@ -1,6 +1,14 @@
 class Application < Sinatra::Base
   register Sinatra::ActiveRecordExtension
-  
+
+  use Rack::Cors do |config|
+    config.allow do |allow|
+      allow.origins '*'
+      allow.resource '/*', headers: :any, methods: [:get, :post, :put, :delete, :options]
+    end
+  end
+ 
+  disable :protection # disabling rack/protection which is by default enabled with Sinatra
   enable :raise_errors
   #disable :show_exceptions
   #disable :raise_errors
@@ -8,10 +16,6 @@ class Application < Sinatra::Base
   configure do
     set :database, DATABASE_URL
     ActiveRecord::Base.logger = nil unless RACK_ENV == "development"
-  end
-
-  configure :development do
-    register Sinatra::Reloader
   end
 
   helpers do
@@ -26,10 +30,6 @@ class Application < Sinatra::Base
       auth    = Base64.decode64 token
       auth.split(/:/)[0]
     end
-  end
-
-  before do
-    response['Access-Control-Allow-Origin'] = "*"
   end
   
   get "/" do

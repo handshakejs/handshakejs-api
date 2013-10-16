@@ -10,6 +10,7 @@ gem 'pg'
 gem 'pry'
 gem 'racksh'
 gem 'rake'
+gem 'rack-cors',                        require: 'rack/cors'
 gem 'sinatra',                          require: 'sinatra/base'
 gem 'sinatra-contrib',                  require: %w(sinatra/multi_route sinatra/reloader)
 gem 'state_machine'
