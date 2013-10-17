@@ -19,8 +19,10 @@ I've tried to make it as easy to use as possible, but if you have any feedback p
 git clone https://github.com/scottmotte/emailauth.git
 cd emailauth
 heroku create emailauth
+heroku addons:add sendgrid
 git push heroku master
 heroku run rake db:migrate
+heroku config:set FROM=login@yourapp.com
 ```
 
 Next, create your first app.

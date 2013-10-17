@@ -6,6 +6,7 @@ class Login < ActiveRecord::Base
 
   before_create :generate_authcode
   before_create :set_identity
+  after_create  :deliver_authcode_email
 
   state_machine :status, :initial => :requested do
     event :mark_confirmed! do
@@ -47,5 +48,26 @@ class Login < ActiveRecord::Base
     else
       self.identity = app.identities.create(email: email)
     end
+  end
+
+  def deliver_authcode_email 
+    puts "="*100
+    response = Pony.mail({
+      to:       email,
+      from:     FROM,
+      subject:  "Your code: #{authcode}. Please enter it to login.",
+      body:     "Your code: #{authcode}. Please enter it to login.",
+      via:      :smtp,
+      :via_options => {
+        :address        => SMTP_ADDRESS,
+        :port           => SMTP_PORT,
+        :user_name      => SMTP_USERNAME,
+        :password       => SMTP_PASSWORD,
+        :authentication => :plain
+      }
+    })
+
+    puts response
+    puts "="*100
   end
 end

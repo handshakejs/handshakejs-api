@@ -7,6 +7,7 @@ gem 'foreman'
 gem 'json'
 gem 'jsonify',                          require: %w(jsonify jsonify/tilt)
 gem 'pg'
+gem 'pony'
 gem 'pry'
 gem 'racksh'
 gem 'rake'

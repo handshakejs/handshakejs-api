@@ -59,7 +59,6 @@ class ApiV0 < Application
       @login  = @app.logins.build(params_to_save)
 
       if @login.save
-        # SEND THE EMAIL HERE WITH THE AUTHCODE!!!!
         jsonify :"/api_v0/login/request"
       else
         @message = @login.errors.full_messages.to_sentence
