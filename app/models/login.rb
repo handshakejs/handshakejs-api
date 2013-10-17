@@ -18,7 +18,7 @@ class Login < ActiveRecord::Base
     app   = App.where(app_name: params[:app_name]).first
     return [nil, "Sorry, we couldn't find an app by that app_name."] if !app
 
-    login = app.logins.where(email: params[:email]).first
+    login = app.logins.where(email: params[:email]).last
     return [nil, "Sorry, we couldn't find a login request using that email."] if !login
     return [nil, "Sorry, the authcode is incorrect."] if login.authcode != params[:authcode]
 
