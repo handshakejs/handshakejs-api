@@ -1,15 +1,6 @@
-# [emailauth.io](https://emailauth.herokuapp.com) API Documentation
+# [emailauth](https://emailauth.herokuapp.com) API Documentation
 
 **API platform for authenticating users without requiring a password.**
-
-The [emailauth.io](https://emailauth.herokuapp.com) API is based around REST. It uses standard HTTP authentication. [JSON](https://www.json.org/) is returned in all responses from the API, including errors.
-
-I've tried to make it as easy to use as possible, but if you have any feedback please [let me know](mailto:scott@scottmotte.com).
-
-* [Summary](#summary)
-* [Apps](#apps)
-* [Logins](#logins)
-* [Identity](#identities) 
 
 ## Installation
 
@@ -35,7 +26,37 @@ curl -X POST https://emailauth.herokuapp.com/api/v0/apps/create.json \
 
 Nice, that's all it takes to get your authentication system running. Now let's plug that into our app using the embeddable JavaScript.
 
-IMPLEMENT INSTRUCTIONS
+Place a script tag wherever you want the login form displayed.  
+
+```html
+<script src='/path/to/emailauth.js' 
+        data-app_name="myappname" 
+        data-root_url="https://emailauth.herokuapp.com"></script>
+```
+
+Get the latest [emailauth.js here](https://github.com/scottmotte/emailauth-js/blob/master/build/emailauth.js). Replace the `data-app_name` with your own.
+
+Next, bind to the emailauth:login_confirm event to get the successful login data. This is where you would make an internal request to your application to set the session for the user.
+
+```html
+<script>
+  emailauth.script.addEventListener('emailauth:login_confirm', function(e) {
+    // do something here local to your app to create a session for the user
+    console.log(e.data);
+  }, false); 
+</script>
+```
+
+## API Overview
+
+The [emailauth.herokuapp.com](https://emailauth.herokuapp.com) API is based around REST. It uses standard HTTP authentication. [JSON](https://www.json.org/) is returned in all responses from the API, including errors.
+
+I've tried to make it as easy to use as possible, but if you have any feedback please [let me know](mailto:scott@scottmotte.com).
+
+* [Summary](#summary)
+* [Apps](#apps)
+* [Logins](#logins)
+* [Identity](#identities) 
 
 ## Summary
 
