@@ -21,7 +21,7 @@ Next, create your first app.
 ```bash
 curl -X POST https://emailauth.herokuapp.com/api/v0/apps/create.json \
 -d "email=you@email.com" \
--d "app_name=myappname"
+-d "app_name=your_app_name"
 ```
 
 Nice, that's all it takes to get your authentication system running. Now let's plug that into our app using the embeddable JavaScript.
@@ -31,7 +31,7 @@ Place a script tag wherever you want the login form displayed.
 ```html
 <script src='/path/to/emailauth.js' 
         data-app_name="your_app_name" 
-        data-root_url="https://emailauth.herokuapp.com"></script>
+        data-root_url="https://yourherokusubdomain.herokuapp.com"></script>
 ```
 
 Get the latest [emailauth.js here](https://github.com/scottmotte/emailauth-js/blob/master/build/emailauth.js). Replace the `data-app_name` with your own.
