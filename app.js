@@ -274,13 +274,31 @@ server.route({
 
 server.route({
   method  : 'POST',
+  path    : '/apps/create.json',
+  config  : apps.create
+});
+
+server.route({
+  method  : 'POST',
   path    : '/login/request',
   config  : login.request
 });
 
 server.route({
   method  : 'POST',
+  path    : '/login/request.json',
+  config  : login.request
+});
+
+server.route({
+  method  : 'POST',
   path    : '/login/confirm',
+  config  : login.confirm
+});
+
+server.route({
+  method  : 'POST',
+  path    : '/login/confirm.json',
   config  : login.confirm
 });
 
