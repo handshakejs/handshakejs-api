@@ -1,4 +1,4 @@
-# [handshake](https://handshake.herokuapp.com) API Documentation
+# [Handshake](https://handshake.herokuapp.com) API Documentation
 
 **API platform for authenticating users without requiring a password.**
 
