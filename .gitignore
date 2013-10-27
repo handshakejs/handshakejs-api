@@ -5,3 +5,4 @@ tmp/pids/*
 log/
 .env*
 .ruby-version
+node_modules
