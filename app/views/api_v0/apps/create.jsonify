@@ -1,6 +1,0 @@
-json.success true
-json.app do
-  json.id         @app.short_id
-  json.email      @app.email
-  json.app_name   @app.app_name
-end
