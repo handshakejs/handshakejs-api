@@ -8,9 +8,9 @@
 ### Heroku
 
 ```bash
-git clone https://github.com/scottmotte/emailauth.git
-cd emailauth
-heroku create emailauth
+git clone https://github.com/scottmotte/handshake.git
+cd handshake
+heroku create handshake
 heroku addons:add sendgrid
 git push heroku master
 heroku run rake db:migrate
@@ -20,7 +20,7 @@ heroku config:set FROM=login@yourapp.com
 Next, create your first app.
 
 ```bash
-curl -X POST https://emailauth.herokuapp.com/api/v0/apps/create.json \
+curl -X POST https://handshake.herokuapp.com/api/v0/apps/create.json \
 -d "email=you@email.com" \
 -d "app_name=your_app_name"
 ```
@@ -30,18 +30,18 @@ Nice, that's all it takes to get your authentication system running. Now let's p
 Place a script tag wherever you want the login form displayed.  
 
 ```html
-<script src='/path/to/emailauth.js' 
+<script src='/path/to/handshake.js' 
         data-app_name="your_app_name" 
         data-root_url="https://yourherokusubdomain.herokuapp.com"></script>
 ```
 
-Get the latest [emailauth.js here](https://github.com/scottmotte/emailauth-js/blob/master/build/emailauth.js). Replace the `data-app_name` with your own.
+Get the latest [handshake.js here](https://github.com/scottmotte/handshake-js/blob/master/build/handshake.js). Replace the `data-app_name` with your own.
 
-Next, bind to the emailauth:login_confirm event to get the successful login data. This is where you would make an internal request to your application to set the session for the user.
+Next, bind to the handshake:login_confirm event to get the successful login data. This is where you would make an internal request to your application to set the session for the user.
 
 ```html
 <script>
-  emailauth.script.addEventListener('emailauth:login_confirm', function(e) {
+  handshake.script.addEventListener('handshake:login_confirm', function(e) {
     console.log(e.data);
     $.post("/login/success", {email: e.data.identity.email}, function(data) {
       window.location.href = "/dashboard";
@@ -50,7 +50,7 @@ Next, bind to the emailauth:login_confirm event to get the successful login data
 </script>
 ```
 
-Then you'd setup a route in your app at /login/success to do something like this (setting the session). Here's an example in ruby and there is also a [full example ruby app](https://github.com/scottmotte/emailauth-example-ruby).
+Then you'd setup a route in your app at /login/success to do something like this (setting the session). Here's an example in ruby and there is also a [full example ruby app](https://github.com/scottmotte/handshake-example-ruby).
 
 ```ruby
   post "/login/success" do
@@ -61,7 +61,7 @@ Then you'd setup a route in your app at /login/success to do something like this
 
 ## API Overview
 
-The [emailauth.herokuapp.com](https://emailauth.herokuapp.com) API is based around REST. It uses standard HTTP authentication. [JSON](https://www.json.org/) is returned in all responses from the API, including errors.
+The [handshake.herokuapp.com](https://handshake.herokuapp.com) API is based around REST. It uses standard HTTP authentication. [JSON](https://www.json.org/) is returned in all responses from the API, including errors.
 
 I've tried to make it as easy to use as possible, but if you have any feedback please [let me know](mailto:scott@scottmotte.com).
 
@@ -73,20 +73,20 @@ I've tried to make it as easy to use as possible, but if you have any feedback p
 
 ### API Endpoint
 
-* https://emailauth.herokuapp.com/api/v0
+* https://handshake.herokuapp.com/api/v0
 
 ## Apps
 
-To start using the emailauth.io API, you must first create an app.
+To start using the handshake.io API, you must first create an app.
 
 ### POST /apps/create
 
-Pass an email and app_name to create your app at emailauth.herokuapp.com.
+Pass an email and app_name to create your app at handshake.herokuapp.com.
 
 #### Definition
 
 ```bash
-POST https://emailauth.herokuapp.com/api/v0/apps/create.json
+POST https://handshake.herokuapp.com/api/v0/apps/create.json
 ```
 
 #### Required Parameters
@@ -97,7 +97,7 @@ POST https://emailauth.herokuapp.com/api/v0/apps/create.json
 #### Example Request
 
 ```bash
-curl -X POST https://emailauth.herokuapp.com/api/v0/apps/create.json \
+curl -X POST https://handshake.herokuapp.com/api/v0/apps/create.json \
 -d "email=test@example.com" \
 -d "app_name=myapp"
 ```
@@ -122,7 +122,7 @@ Request a login.
 #### Definition
 
 ```bash
-POST https://emailauth.herokuapp.com/api/v0/login/request.json
+POST https://handshake.herokuapp.com/api/v0/login/request.json
 ```
 
 #### Required Parameters
@@ -133,7 +133,7 @@ POST https://emailauth.herokuapp.com/api/v0/login/request.json
 #### Example Request
 
 ```bash
-curl -X POST https://emailauth.herokuapp.com/api/v0/login/request.json \ 
+curl -X POST https://handshake.herokuapp.com/api/v0/login/request.json \ 
 -d "email=test@example.com" \
 -d "app_name=your_app_name"
 ```
@@ -157,7 +157,7 @@ Confirm a login. Email and authcode must match to get a success response back.
 #### Definition
 
 ```bash
-POST https://emailauth.herokuapp.com/api/v0/login/confirm.json
+POST https://handshake.herokuapp.com/api/v0/login/confirm.json
 ```
 
 #### Required Parameters
@@ -169,7 +169,7 @@ POST https://emailauth.herokuapp.com/api/v0/login/confirm.json
 #### Example Request
 
 ```bash
-curl -X POST https://emailauth.herokuapp.com/api/v0/login/confirm.json \
+curl -X POST https://handshake.herokuapp.com/api/v0/login/confirm.json \
 -d "email=test@example.com" \
 -d "authcode=7389" \ 
 -d "app_name=your_app_name"
