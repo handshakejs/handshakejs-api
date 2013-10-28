@@ -2,7 +2,6 @@
 
 **API platform for authenticating users without requiring a password.**
 
-
 ## Installation
 
 ### Heroku
@@ -32,7 +31,7 @@ Place a script tag wherever you want the login form displayed.
 ```html
 <script src='/path/to/handshake.js' 
         data-app_name="your_app_name" 
-        data-root_url="https://yourherokusubdomain.herokuapp.com"></script>
+        data-root_url="https://handshakejs.herokuapp.com"></script>
 ```
 
 Get the latest [handshake.js here](https://github.com/scottmotte/handshake-js/blob/master/build/handshake.js). Replace the `data-app_name` with your own.
