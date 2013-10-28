@@ -302,4 +302,6 @@ server.route({
   config  : login.confirm
 });
 
-server.start();
+server.start(function() {
+  console.log('Handshake.js server started at: ' + server.info.uri);
+});
