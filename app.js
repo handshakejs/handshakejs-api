@@ -77,7 +77,7 @@ App.prototype.create = function(fn){
   var key     = "apps/"+_this.app_name;
 
   this._validator.check(_this.email, "Invalid email.").isEmail();
-  this._validator.check(_this.app_name, "App_name must be alphanumeric, underscore, or dashes.").is(/^[a-z\_\-]+$/);
+  this._validator.check(_this.app_name, "App_name must be alphanumeric, underscore, or dashes.").is(/^[a-z0-9\_\-]+$/);
 
   var errors = this._validator.errors();
   delete(this._validator);
