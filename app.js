@@ -274,37 +274,37 @@ var login = {
 
 server.route({
   method  : 'POST',
-  path    : '/apps/create',
+  path    : '/api/v0/apps/create',
   config  : apps.create
 });
 
 server.route({
   method  : 'POST',
-  path    : '/apps/create.json',
+  path    : '/api/v0/apps/create.json',
   config  : apps.create
 });
 
 server.route({
   method  : 'POST',
-  path    : '/login/request',
+  path    : '/api/v0/login/request',
   config  : login.request
 });
 
 server.route({
   method  : 'POST',
-  path    : '/login/request.json',
+  path    : '/api/v0/login/request.json',
   config  : login.request
 });
 
 server.route({
   method  : 'POST',
-  path    : '/login/confirm',
+  path    : '/api/v0/login/confirm',
   config  : login.confirm
 });
 
 server.route({
   method  : 'POST',
-  path    : '/login/confirm.json',
+  path    : '/api/v0/login/confirm.json',
   config  : login.confirm
 });
 
