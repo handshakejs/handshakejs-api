@@ -1,4 +1,4 @@
-# [Handshake](https://handshake.herokuapp.com) API Documentation
+# [Handshake](https://handshakejs.herokuapp.com) API Documentation
 
 **API platform for authenticating users without requiring a password.**
 
@@ -10,17 +10,17 @@
 ```bash
 git clone https://github.com/scottmotte/handshake.git
 cd handshake
-heroku create handshake
+heroku create handshakejs
 heroku addons:add sendgrid
+heroku addons:add redistogo
 git push heroku master
-heroku run rake db:migrate
 heroku config:set FROM=login@yourapp.com
 ```
 
 Next, create your first app.
 
 ```bash
-curl -X POST https://handshake.herokuapp.com/api/v0/apps/create.json \
+curl -X POST https://handshakejs.herokuapp.com/api/v0/apps/create.json \
 -d "email=you@email.com" \
 -d "app_name=your_app_name"
 ```
@@ -61,7 +61,7 @@ Then you'd setup a route in your app at /login/success to do something like this
 
 ## API Overview
 
-The [handshake.herokuapp.com](https://handshake.herokuapp.com) API is based around REST. It uses standard HTTP authentication. [JSON](https://www.json.org/) is returned in all responses from the API, including errors.
+The [handshakejs.herokuapp.com](https://handshakejs.herokuapp.com) API is based around REST. It uses standard HTTP authentication. [JSON](https://www.json.org/) is returned in all responses from the API, including errors.
 
 I've tried to make it as easy to use as possible, but if you have any feedback please [let me know](mailto:scott@scottmotte.com).
 
@@ -73,20 +73,20 @@ I've tried to make it as easy to use as possible, but if you have any feedback p
 
 ### API Endpoint
 
-* https://handshake.herokuapp.com/api/v0
+* https://handshakejs.herokuapp.com/api/v0
 
 ## Apps
 
-To start using the handshake.io API, you must first create an app.
+To start using the handshake API, you must first create an app.
 
 ### POST /apps/create
 
-Pass an email and app_name to create your app at handshake.herokuapp.com.
+Pass an email and app_name to create your app at handshakejs.herokuapp.com.
 
 #### Definition
 
 ```bash
-POST https://handshake.herokuapp.com/api/v0/apps/create.json
+POST https://handshakejs.herokuapp.com/api/v0/apps/create.json
 ```
 
 #### Required Parameters
@@ -97,7 +97,7 @@ POST https://handshake.herokuapp.com/api/v0/apps/create.json
 #### Example Request
 
 ```bash
-curl -X POST https://handshake.herokuapp.com/api/v0/apps/create.json \
+curl -X POST https://handshakejs.herokuapp.com/api/v0/apps/create.json \
 -d "email=test@example.com" \
 -d "app_name=myapp"
 ```
@@ -122,7 +122,7 @@ Request a login.
 #### Definition
 
 ```bash
-POST https://handshake.herokuapp.com/api/v0/login/request.json
+POST https://handshakejs.herokuapp.com/api/v0/login/request.json
 ```
 
 #### Required Parameters
@@ -133,7 +133,7 @@ POST https://handshake.herokuapp.com/api/v0/login/request.json
 #### Example Request
 
 ```bash
-curl -X POST https://handshake.herokuapp.com/api/v0/login/request.json \ 
+curl -X POST https://handshakejs.herokuapp.com/api/v0/login/request.json \ 
 -d "email=test@example.com" \
 -d "app_name=your_app_name"
 ```
@@ -157,7 +157,7 @@ Confirm a login. Email and authcode must match to get a success response back.
 #### Definition
 
 ```bash
-POST https://handshake.herokuapp.com/api/v0/login/confirm.json
+POST https://handshakejs.herokuapp.com/api/v0/login/confirm.json
 ```
 
 #### Required Parameters
@@ -169,7 +169,7 @@ POST https://handshake.herokuapp.com/api/v0/login/confirm.json
 #### Example Request
 
 ```bash
-curl -X POST https://handshake.herokuapp.com/api/v0/login/confirm.json \
+curl -X POST https://handshakejs.herokuapp.com/api/v0/login/confirm.json \
 -d "email=test@example.com" \
 -d "authcode=7389" \ 
 -d "app_name=your_app_name"
