@@ -10,17 +10,23 @@ e.ENV           = process.env.NODE_ENV || 'development';
 
 // Constants
 var DATABASE_URL            = process.env.DATABASE_URL; 
-var FROM                    = process.env.FROM || "login@emailauth.io"
+var FROM                    = process.env.FROM || "login@emailauth.io";
 var SUBJECT                 = process.env.SUBJECT || "Your code: {{authcode}}. Please enter it to login.";
 var BODY                    = process.env.BODY || "Your code: {{authcode}}. Please enter it to login.";
 var AUTHCODE_LIFE_IN_MS     = process.env.AUTHCODE_LIFE_IN_MS || "120000";
-var SMTP_ADDRESS            = process.env.SMTP_ADDRESS || "smtp.sendgrid.net"
-var SMTP_PORT               = process.env.SMTP_PORT || 25
-var SMTP_USERNAME           = process.env.SMTP_USERNAME || process.env.SENDGRID_USERNAME
-var SMTP_PASSWORD           = process.env.SMTP_PASSWORD || process.env.SENDGRID_PASSWORD
+var SMTP_ADDRESS            = process.env.SMTP_ADDRESS || "smtp.sendgrid.net";
+var SMTP_PORT               = process.env.SMTP_PORT || 25;
+var SMTP_USERNAME           = process.env.SMTP_USERNAME || process.env.SENDGRID_USERNAME;
+var SMTP_PASSWORD           = process.env.SMTP_PASSWORD || process.env.SENDGRID_PASSWORD;
+var REDIS_URL               = process.env.REDIS_URL || process.env.REDISTOGO_URL || "redis://localhost:6379";
 
 // Libraries
-var db          = redis.createClient();
+var redis_url   = require("url").parse(REDIS_URL);
+var db          = redis.createClient(redis_url.port, redis_url.hostname);
+if (redis_url.auth) {
+  db.auth(redis_url.auth.split(":")[1]); 
+}
+
 var sendgrid    = require('sendgrid')(SMTP_USERNAME, SMTP_PASSWORD);
 
 var port        = parseInt(process.env.PORT) || 3000;
