@@ -1,5 +1,7 @@
 # [Handshake](https://handshakejs.herokuapp.com) API Documentation
 
+![](https://rawgithub.com/scottmotte/handshake-js/master/handshakejs.svg)
+
 **API platform for authenticating users without requiring a password.**
 
 ## Installation
