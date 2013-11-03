@@ -1,4 +1,4 @@
-var dotenv      = require('dotenv')();
+var dotenv      = require('dotenv');
 dotenv.load();
 
 var redis       = require('redis');
