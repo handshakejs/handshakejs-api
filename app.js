@@ -206,7 +206,7 @@ var apps = {
       app.create(function(err, res) {
         if (err) {
           var message = err.length ? err[0].message : err.message;
-          request.reply({success: false, errors: {message: message}});
+          request.reply({success: false, error: {message: message}});
         } else {
           request.reply({success: true, app: res.toJson()});
         }
@@ -229,7 +229,7 @@ var login = {
       identity.create(function(err, res) {
         if (err) {
           var message = err.length ? err[0].message : err.message;
-          request.reply({success: false, errors: {message: message}});
+          request.reply({success: false, error: {message: message}});
         } else {
           var identity = res.toJson();
           var email = new sendgrid.Email({
@@ -241,7 +241,7 @@ var login = {
           email.addSubVal('{{authcode}}', res.authcode);
           sendgrid.send(email, function(err, json) {
             if (err) { 
-              request.reply({success: false, errors: {message: err.message}});
+              request.reply({success: false, error: {message: err.message}});
             } else {
               request.reply({success: true, identity: identity});
             }
@@ -262,7 +262,7 @@ var login = {
 
       Identity.confirm(confirm_payload, function(err, res) {
         if (err) { 
-          request.reply({success: false, errors: {message: err.message}});
+          request.reply({success: false, error: {message: err.message}});
         } else {
           request.reply({success: true, identity: res});
         }
