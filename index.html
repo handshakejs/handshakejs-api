@@ -1,0 +1,252 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Handshake by scottmotte</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Handshake</h1>
+        <p>API platform for authenticating users without requiring a password.</p>
+
+        <p class="view"><a href="https://github.com/scottmotte/handshake">View the Project on GitHub <small>scottmotte/handshake</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/scottmotte/handshake/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/scottmotte/handshake/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/scottmotte/handshake">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="handshake-api-documentation" class="anchor" href="#handshake-api-documentation"><span class="octicon octicon-link"></span></a><a href="https://handshakejs.herokuapp.com">Handshake</a> API Documentation</h1>
+
+<p><img src="https://rawgithub.com/scottmotte/handshake-js/master/handshakejs.svg" alt=""></p>
+
+<p><strong>API platform for authenticating users without requiring a password.</strong></p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<h3>
+<a name="heroku" class="anchor" href="#heroku"><span class="octicon octicon-link"></span></a>Heroku</h3>
+
+<div class="highlight highlight-bash"><pre>git clone https://github.com/scottmotte/handshake.git
+<span class="nb">cd </span>handshake
+heroku create handshakejs
+heroku addons:add sendgrid
+heroku addons:add redistogo
+git push heroku master
+heroku config:set <span class="nv">FROM</span><span class="o">=</span>login@yourapp.com
+</pre></div>
+
+<p>Next, create your first app.</p>
+
+<div class="highlight highlight-bash"><pre>curl -X POST https://handshakejs.herokuapp.com/api/v0/apps/create.json <span class="se">\</span>
+-d <span class="s2">"email=you@email.com"</span> <span class="se">\</span>
+-d <span class="s2">"app_name=your_app_name"</span>
+</pre></div>
+
+<p>Nice, that's all it takes to get your authentication system running. Now let's plug that into our app using the embeddable JavaScript.</p>
+
+<p>Place a script tag wherever you want the login form displayed.  </p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">'/path/to/handshake.js'</span> 
+        <span class="na">data-app_name=</span><span class="s">"your_app_name"</span> 
+        <span class="na">data-root_url=</span><span class="s">"https://handshakejs.herokuapp.com"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+<p>Get the latest <a href="https://github.com/scottmotte/handshake-js/blob/master/build/handshake.js">handshake.js here</a>. Replace the <code>data-app_name</code> with your own.</p>
+
+<p>Next, bind to the handshake:login_confirm event to get the successful login data. This is where you would make an internal request to your application to set the session for the user.</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;script&gt;</span>
+  <span class="nx">handshake</span><span class="p">.</span><span class="nx">script</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'handshake:login_confirm'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s2">"/login/success"</span><span class="p">,</span> <span class="p">{</span><span class="nx">email</span><span class="o">:</span> <span class="nx">e</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">identity</span><span class="p">.</span><span class="nx">email</span><span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span> <span class="o">=</span> <span class="s2">"/dashboard"</span><span class="p">;</span>
+    <span class="p">});</span>    
+  <span class="p">},</span> <span class="kc">false</span><span class="p">);</span> 
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p>Then you'd setup a route in your app at /login/success to do something like this (setting the session). Here's an example in ruby and there is also a <a href="https://github.com/scottmotte/handshake-example-ruby">full example ruby app</a>.</p>
+
+<div class="highlight highlight-ruby"><pre>  <span class="n">post</span> <span class="s2">"/login/success"</span> <span class="k">do</span>
+    <span class="n">session</span><span class="o">[</span><span class="ss">:user</span><span class="o">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:email</span><span class="o">]</span>
+    <span class="n">redirect</span> <span class="s2">"/dashboard"</span>
+  <span class="k">end</span>
+</pre></div>
+
+<h2>
+<a name="api-overview" class="anchor" href="#api-overview"><span class="octicon octicon-link"></span></a>API Overview</h2>
+
+<p>The <a href="https://handshakejs.herokuapp.com">handshakejs.herokuapp.com</a> API is based around REST. It uses standard HTTP authentication. <a href="https://www.json.org/">JSON</a> is returned in all responses from the API, including errors.</p>
+
+<p>I've tried to make it as easy to use as possible, but if you have any feedback please <a href="mailto:scott@scottmotte.com">let me know</a>.</p>
+
+<ul>
+<li><a href="#summary">Summary</a></li>
+<li><a href="#apps">Apps</a></li>
+<li><a href="#login">Login</a></li>
+</ul><h2>
+<a name="summary" class="anchor" href="#summary"><span class="octicon octicon-link"></span></a>Summary</h2>
+
+<h3>
+<a name="api-endpoint" class="anchor" href="#api-endpoint"><span class="octicon octicon-link"></span></a>API Endpoint</h3>
+
+<ul>
+<li><a href="https://handshakejs.herokuapp.com/api/v0">https://handshakejs.herokuapp.com/api/v0</a></li>
+</ul><h2>
+<a name="apps" class="anchor" href="#apps"><span class="octicon octicon-link"></span></a>Apps</h2>
+
+<p>To start using the handshake API, you must first create an app.</p>
+
+<h3>
+<a name="post-appscreate" class="anchor" href="#post-appscreate"><span class="octicon octicon-link"></span></a>POST /apps/create</h3>
+
+<p>Pass an email and app_name to create your app at handshakejs.herokuapp.com.</p>
+
+<h4>
+<a name="definition" class="anchor" href="#definition"><span class="octicon octicon-link"></span></a>Definition</h4>
+
+<div class="highlight highlight-bash"><pre>POST https://handshakejs.herokuapp.com/api/v0/apps/create.json
+</pre></div>
+
+<h4>
+<a name="required-parameters" class="anchor" href="#required-parameters"><span class="octicon octicon-link"></span></a>Required Parameters</h4>
+
+<ul>
+<li>email</li>
+<li>app_name</li>
+</ul><h4>
+<a name="example-request" class="anchor" href="#example-request"><span class="octicon octicon-link"></span></a>Example Request</h4>
+
+<div class="highlight highlight-bash"><pre>curl -X POST https://handshakejs.herokuapp.com/api/v0/apps/create.json <span class="se">\</span>
+-d <span class="s2">"email=test@example.com"</span> <span class="se">\</span>
+-d <span class="s2">"app_name=myapp"</span>
+</pre></div>
+
+<h4>
+<a name="example-response" class="anchor" href="#example-response"><span class="octicon octicon-link"></span></a>Example Response</h4>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+  <span class="nx">success</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nx">app</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">email</span><span class="o">:</span> <span class="s2">"test@example.com"</span><span class="p">,</span>
+    <span class="nx">app_name</span><span class="o">:</span> <span class="s2">"myapp"</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="logins" class="anchor" href="#logins"><span class="octicon octicon-link"></span></a>Logins</h2>
+
+<h3>
+<a name="post-loginrequest" class="anchor" href="#post-loginrequest"><span class="octicon octicon-link"></span></a>POST /login/request</h3>
+
+<p>Request a login.</p>
+
+<h4>
+<a name="definition-1" class="anchor" href="#definition-1"><span class="octicon octicon-link"></span></a>Definition</h4>
+
+<div class="highlight highlight-bash"><pre>POST https://handshakejs.herokuapp.com/api/v0/login/request.json
+</pre></div>
+
+<h4>
+<a name="required-parameters-1" class="anchor" href="#required-parameters-1"><span class="octicon octicon-link"></span></a>Required Parameters</h4>
+
+<ul>
+<li>email</li>
+<li>app_name</li>
+</ul><h4>
+<a name="example-request-1" class="anchor" href="#example-request-1"><span class="octicon octicon-link"></span></a>Example Request</h4>
+
+<div class="highlight highlight-bash"><pre>curl -X POST https://handshakejs.herokuapp.com/api/v0/login/request.json <span class="se">\ </span>
+-d <span class="s2">"email=test@example.com"</span> <span class="se">\</span>
+-d <span class="s2">"app_name=your_app_name"</span>
+</pre></div>
+
+<h4>
+<a name="example-response-1" class="anchor" href="#example-response-1"><span class="octicon octicon-link"></span></a>Example Response</h4>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+  <span class="nx">success</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nx">identity</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">email</span><span class="o">:</span> <span class="s2">"test@example.com"</span><span class="p">,</span>
+    <span class="nx">app_name</span><span class="o">:</span> <span class="s2">"your_app_name"</span><span class="p">,</span>
+    <span class="nx">authcode_expired_at</span><span class="o">:</span> <span class="s2">"1382833591309"</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>
+<a name="post-loginconfirm" class="anchor" href="#post-loginconfirm"><span class="octicon octicon-link"></span></a>POST /login/confirm</h3>
+
+<p>Confirm a login. Email and authcode must match to get a success response back. </p>
+
+<h4>
+<a name="definition-2" class="anchor" href="#definition-2"><span class="octicon octicon-link"></span></a>Definition</h4>
+
+<div class="highlight highlight-bash"><pre>POST https://handshakejs.herokuapp.com/api/v0/login/confirm.json
+</pre></div>
+
+<h4>
+<a name="required-parameters-2" class="anchor" href="#required-parameters-2"><span class="octicon octicon-link"></span></a>Required Parameters</h4>
+
+<ul>
+<li>email</li>
+<li>authcode</li>
+<li>app_name</li>
+</ul><h4>
+<a name="example-request-2" class="anchor" href="#example-request-2"><span class="octicon octicon-link"></span></a>Example Request</h4>
+
+<div class="highlight highlight-bash"><pre>curl -X POST https://handshakejs.herokuapp.com/api/v0/login/confirm.json <span class="se">\</span>
+-d <span class="s2">"email=test@example.com"</span> <span class="se">\</span>
+-d <span class="s2">"authcode=7389"</span> <span class="se">\ </span>
+-d <span class="s2">"app_name=your_app_name"</span>
+</pre></div>
+
+<h4>
+<a name="example-response-2" class="anchor" href="#example-response-2"><span class="octicon octicon-link"></span></a>Example Response</h4>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+  <span class="nx">success</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nx">identity</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">email</span><span class="o">:</span> <span class="s2">"test@example.com"</span><span class="p">,</span>
+    <span class="nx">app_name</span><span class="o">:</span> <span class="s2">"your_app_name"</span><span class="p">,</span>
+    <span class="nx">authcode</span><span class="o">:</span> <span class="s2">"7389"</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="database-schema-with-redis" class="anchor" href="#database-schema-with-redis"><span class="octicon octicon-link"></span></a>Database Schema with Redis</h2>
+
+<p>apps - collection of keys with all the app_names in there. SADD</p>
+
+<p>apps/myappname - hash with all the data in there. HSET or HMSET</p>
+
+<p>apps/theappname/identities - collection of keys with all the identities' emails in there. SADD</p>
+
+<p>apps/theappname/identities/emailaddress HSET or HMSET</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/scottmotte">scottmotte</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
