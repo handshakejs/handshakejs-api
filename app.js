@@ -157,6 +157,7 @@ Identity.prototype.create = function(fn){
 };
 
 Identity.confirm = function(identity, fn) {
+  identity.email    = sanitize(identity.email).trim().toLowerCase();
   var key           = "apps/"+identity.app_name+"/identities/"+identity.email;
 
   db.EXISTS(key, function(err, res) {
