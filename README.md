@@ -23,7 +23,8 @@ Next, create your first app.
 ```bash
 curl -X POST https://handshakejs.herokuapp.com/api/v0/apps/create.json \
 -d "email=you@email.com" \
--d "app_name=your_app_name"
+-d "app_name=your_app_name" \
+-d "salt=yourveryimportantsaltmustbeuniquemothaeffa"
 ```
 
 Nice, that's all it takes to get your authentication system running. Now let's plug that into our app using the embeddable JavaScript.
