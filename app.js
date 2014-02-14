@@ -59,6 +59,7 @@ var App = module.exports.App = function(self){
   this._validator   = new Validator();
   this.app_name     = sanitize(self.app_name).trim().toLowerCase() || "";
   this.email        = sanitize(self.email).trim().toLowerCase() || "";
+  this.salt         = self.salt || "";
 
   return this;
 };
@@ -68,7 +69,8 @@ App.prototype.toJson = function(fn) {
 
   return {
     email: _this.email,
-    app_name: _this.app_name
+    app_name: _this.app_name,
+    salt: _this.salt
   }
 };
 
@@ -78,6 +80,7 @@ App.prototype.create = function(fn){
 
   this._validator.check(_this.email, "Invalid email.").isEmail();
   this._validator.check(_this.app_name, "App_name must be alphanumeric, underscore, or dashes.").is(/^[a-z0-9\_\-]+$/);
+  this._validator.check(_this.salt, "Salt must be alphanumeric, underscore, or dashes.").is(/^[a-z0-9\_\-]+$/);
 
   var errors = this._validator.errors();
   delete(this._validator);
@@ -199,9 +202,11 @@ var apps = {
       var payload   = request.payload;
       var email     = payload.email;
       var app_name  = payload.app_name;
+      var salt      = payload.salt;
       var app = new App({
         email: email,
-        app_name: app_name
+        app_name: app_name,
+        salt: salt
       }); 
 
       app.create(function(err, res) {
