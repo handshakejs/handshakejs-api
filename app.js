@@ -196,7 +196,7 @@ Identity.confirm = function(identity, fn) {
             crypto.pbkdf2(identity.email, app.salt, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH, function(err, hash) {
               if (err) { return fn(err, null); }
 
-              identity.hash = hash;
+              identity.hash = hash.toString('hex');
 
               return fn(null, identity);
             });
