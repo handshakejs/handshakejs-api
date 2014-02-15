@@ -1,6 +1,7 @@
 var dotenv      = require('dotenv');
 dotenv.load();
 
+var crypto      = require('crypto');
 var redis       = require('redis');
 var sanitize    = require('validator').sanitize;
 var Validator   = require('validator').Validator;
@@ -19,6 +20,9 @@ var SMTP_PORT               = process.env.SMTP_PORT || 25;
 var SMTP_USERNAME           = process.env.SMTP_USERNAME || process.env.SENDGRID_USERNAME;
 var SMTP_PASSWORD           = process.env.SMTP_PASSWORD || process.env.SENDGRID_PASSWORD;
 var REDIS_URL               = process.env.REDIS_URL || process.env.REDISTOGO_URL || "redis://localhost:6379";
+var SALT_LENGTH             = process.env.SALT_LENGTH || 32;
+var PBKDF2_ITERATIONS       = process.env.PBKDF2_ITERATIONS || 1000;
+var PBKDF2_KEY_LENGTH       = process.env.PBKDF2_KEY_LENGTH || 32;
 
 // Libraries
 var redis_url   = require("url").parse(REDIS_URL);
@@ -59,7 +63,7 @@ var App = module.exports.App = function(self){
   this._validator   = new Validator();
   this.app_name     = sanitize(self.app_name).trim().toLowerCase() || "";
   this.email        = sanitize(self.email).trim().toLowerCase() || "";
-  this.salt         = self.salt || "";
+  this.salt         = self.salt || crypto.randomBytes(SALT_LENGTH).toString('hex');
 
   return this;
 };
@@ -80,6 +84,9 @@ App.prototype.create = function(fn){
 
   this._validator.check(_this.email, "Invalid email.").isEmail();
   this._validator.check(_this.app_name, "App_name must be alphanumeric, underscore, or dashes.").is(/^[a-z0-9\_\-]+$/);
+
+  console.log(_this);
+
   this._validator.check(_this.salt, "Salt must be alphanumeric, underscore, or dashes.").is(/^[a-z0-9\_\-]+$/);
 
   var errors = this._validator.errors();
@@ -161,7 +168,8 @@ Identity.prototype.create = function(fn){
 
 Identity.confirm = function(identity, fn) {
   identity.email    = sanitize(identity.email).trim().toLowerCase();
-  var key           = "apps/"+identity.app_name+"/identities/"+identity.email;
+  var app_key       = "apps/"+identity.app_name;
+  var key           = app_key+"/identities/"+identity.email;
 
   db.EXISTS(key, function(err, res) {
     if (err) { return fn(err, null); }
@@ -182,7 +190,18 @@ Identity.confirm = function(identity, fn) {
           }
 
           db.HSET(key, "authcode", ""); // clear authcode on success login/confirm
-          return fn(null, identity);
+          db.HGETALL(app_key, function(err, app) {
+            if (err) { return fn(err, null); }
+
+            crypto.pbkdf2(identity.email, app.salt, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH, function(err, hash) {
+              if (err) { return fn(err, null); }
+
+              identity.hash = hash;
+
+              return fn(null, identity);
+            });
+          });
+
         } else {
           err = new Error("Sorry, the authcode did not match.")
           return fn(err, null);
