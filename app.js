@@ -20,9 +20,9 @@ var SMTP_PORT               = process.env.SMTP_PORT || 25;
 var SMTP_USERNAME           = process.env.SMTP_USERNAME || process.env.SENDGRID_USERNAME;
 var SMTP_PASSWORD           = process.env.SMTP_PASSWORD || process.env.SENDGRID_PASSWORD;
 var REDIS_URL               = process.env.REDIS_URL || process.env.REDISTOGO_URL || "redis://localhost:6379";
-var SALT_LENGTH             = process.env.SALT_LENGTH || 32;
+var SALT_LENGTH             = process.env.SALT_LENGTH || 10;
 var PBKDF2_ITERATIONS       = process.env.PBKDF2_ITERATIONS || 1000;
-var PBKDF2_KEY_LENGTH       = process.env.PBKDF2_KEY_LENGTH || 32;
+var PBKDF2_KEY_LENGTH       = process.env.PBKDF2_KEY_LENGTH || 16;
 
 // Libraries
 var redis_url   = require("url").parse(REDIS_URL);
