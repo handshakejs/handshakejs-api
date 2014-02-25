@@ -1,6 +1,6 @@
-# [Handshake](https://handshakejs.herokuapp.com) API Documentation
+# [handshakejs](https://handshakejs.herokuapp.com) API Documentation
 
-![](https://rawgithub.com/scottmotte/handshake-js/master/handshakejs.svg)
+![](https://rawgithub.com/handshakejs/handshakejs-script/master/handshakejs.svg)
 
 **API platform for authenticating users without requiring a password.**
 
@@ -9,8 +9,8 @@
 ### Heroku
 
 ```bash
-git clone https://github.com/scottmotte/handshake.git
-cd handshake
+git clone https://github.com/sendgrid/handshakejs-api.git
+cd handshakejs-api
 heroku create handshakejs
 heroku addons:add sendgrid
 heroku addons:add redistogo
@@ -36,7 +36,7 @@ Place a script tag wherever you want the login form displayed.
         data-root_url="https://handshakejs.herokuapp.com"></script>
 ```
 
-Get the latest [handshake.js here](https://github.com/scottmotte/handshake-js/blob/master/build/handshake.js). Replace the `data-app_name` with your own.
+Get the latest [handshake.js here](https://github.com/sendgrid/handshakejs-script/blob/master/build/handshake.js). Replace the `data-app_name` with your own.
 
 Next, bind to the handshake:login_confirm event to get the successful login data. This is where you would make an internal request to your application to set the session for the user.
 
@@ -51,7 +51,7 @@ Next, bind to the handshake:login_confirm event to get the successful login data
 </script>
 ```
 
-Then you'd setup a route in your app at /login/success to do something like this (setting the session). Here's an example in ruby and there is also a [full example ruby app](https://github.com/scottmotte/handshake-example-ruby).
+Then you'd setup a route in your app at /login/success to do something like this (setting the session). Here's an example in ruby and there is also a [full example ruby app](https://github.com/handshakejs/handshakejs-example-ruby).
 
 ```ruby
   post "/login/success" do
@@ -73,7 +73,7 @@ First, [install click-to-cloud](https://github.com/scottmotte/click-to-cloud#ins
 Second, run the following command.
 
 ```bash
-click-to-cloud --repo https://github.com/scottmotte/handshake.git
+click-to-cloud --repo https://github.com/sendgrid/handshakejs-api.git
 ```
 
 That's it. That will install your application to Heroku.
