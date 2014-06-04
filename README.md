@@ -105,24 +105,22 @@ Pass an email and app_name to create your app at handshakejs.herokuapp.com.
 #### Definition
 
 ```bash
-POST https://handshakejs.herokuapp.com/api/v0/apps/create.json
+POST|GET https://handshakejs.herokuapp.com/api/v1/apps/create.json
 ```
 
 #### Required Parameters
 
-* email
 * app_name
 
 #### Optional Parameters
 
+* email
 * salt
 
 #### Example Request
 
 ```bash
-curl -X POST https://handshakejs.herokuapp.com/api/v0/apps/create.json \
--d "email=test@example.com" \
--d "app_name=myapp"
+https://handshakejs.herokuapp.com/api/v1/apps/create.json?app_name=[app_name]&email=[email]&salt=[salt]
 ```
 
 #### Example Response
@@ -156,7 +154,7 @@ Request a login.
 #### Definition
 
 ```bash
-POST https://handshakejs.herokuapp.com/api/v0/login/request.json
+POST|GET https://handshakejs.herokuapp.com/api/v1/login/request.json
 ```
 
 #### Required Parameters
@@ -167,20 +165,28 @@ POST https://handshakejs.herokuapp.com/api/v0/login/request.json
 #### Example Request
 
 ```bash
-curl -X POST https://handshakejs.herokuapp.com/api/v0/login/request.json \ 
--d "email=test@example.com" \
--d "app_name=your_app_name"
+https://handshakejs.herokuapp.com/api/v0/login/request.json?email=[email]&app_name=[app_name]
 ```
 
 #### Example Response
 ```javascript
 {
-  success: true,
-  identity: {
+  identities: [{
     email: "test@example.com",
     app_name: "your_app_name",
     authcode_expired_at: "1382833591309"
-  }
+  }]
+}
+```
+
+#### Example Error
+```javascript
+{
+  errors: [{
+    code: "not_found",
+    field: "app_name",
+    message: "app_name could not be found"
+  }]
 }
 ```
 
