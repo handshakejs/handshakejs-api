@@ -3,15 +3,39 @@ package main
 import (
 	"github.com/go-martini/martini"
 	"github.com/handshakejs/handshakejslogic"
+	"github.com/joho/godotenv"
+	mail "github.com/jordan-wright/email"
 	"github.com/martini-contrib/render"
+	"log"
 	"net/http"
+	"net/smtp"
+	"os"
 )
 
 const (
 	LOGIC_ERROR_CODE_UNKNOWN = "unkown"
+	FROM                     = "login@handshakejs.com"
+	SUBJECT                  = "Your code: {{authcode}}. Please enter it to login."
+	BODY                     = "Your code: {{authcode}}. Please enter it to login."
+)
+
+var (
+	SMTP_ADDRESS  string
+	SMTP_PORT     string
+	SMTP_USERNAME string
+	SMTP_PASSWORD string
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	SMTP_ADDRESS = os.Getenv("SMTP_ADDRESS")
+	SMTP_PORT = os.Getenv("SMTP_PORT")
+	SMTP_USERNAME = os.Getenv("SMTP_USERNAME")
+	SMTP_PASSWORD = os.Getenv("SMTP_PASSWORD")
+
 	handshakejslogic.Setup("redis://127.0.0.1:6379")
 
 	m := martini.Classic()
@@ -82,6 +106,7 @@ func IdentitiesCreate(req *http.Request, r render.Render) {
 		statuscode := determineStatusCodeFromLogicError(logic_error)
 		r.JSON(statuscode, payload)
 	} else {
+		go deliverAuthcodeEmail(email, result["authcode"].(string))
 		payload := IdentitiesPayload(result)
 		r.JSON(200, payload)
 	}
@@ -94,4 +119,17 @@ func determineStatusCodeFromLogicError(logic_error *handshakejslogic.LogicError)
 	}
 
 	return code
+}
+
+func deliverAuthcodeEmail(email string, authcode string) {
+	e := mail.NewEmail()
+	e.From = FROM
+	e.To = []string{email}
+	e.Subject = SUBJECT + authcode
+	e.HTML = []byte(BODY)
+
+	err := e.Send(SMTP_ADDRESS+":"+SMTP_PORT, smtp.PlainAuth("", SMTP_USERNAME, SMTP_PASSWORD, SMTP_ADDRESS))
+	if err != nil {
+		log.Println(err)
+	}
 }

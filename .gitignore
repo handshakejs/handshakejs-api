@@ -4,5 +4,6 @@ tmp/
 tmp/pids/*
 log/
 .env*
+!.env.example
 .ruby-version
 node_modules
