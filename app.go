@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-martini/martini"
 	"github.com/handshakejs/handshakejslogic"
+	"github.com/hoisie/mustache"
 	"github.com/joho/godotenv"
 	mail "github.com/jordan-wright/email"
 	"github.com/martini-contrib/render"
@@ -15,26 +16,19 @@ import (
 const (
 	LOGIC_ERROR_CODE_UNKNOWN = "unkown"
 	FROM                     = "login@handshakejs.com"
-	SUBJECT                  = "Your code: {{authcode}}. Please enter it to login."
-	BODY                     = "Your code: {{authcode}}. Please enter it to login."
 )
 
 var (
-	SMTP_ADDRESS  string
-	SMTP_PORT     string
-	SMTP_USERNAME string
-	SMTP_PASSWORD string
+	SMTP_ADDRESS     string
+	SMTP_PORT        string
+	SMTP_USERNAME    string
+	SMTP_PASSWORD    string
+	SUBJECT_TEMPLATE string
+	HTML_TEMPLATE    string
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	SMTP_ADDRESS = os.Getenv("SMTP_ADDRESS")
-	SMTP_PORT = os.Getenv("SMTP_PORT")
-	SMTP_USERNAME = os.Getenv("SMTP_USERNAME")
-	SMTP_PASSWORD = os.Getenv("SMTP_PASSWORD")
+	loadEnvs()
 
 	handshakejslogic.Setup("redis://127.0.0.1:6379")
 
@@ -122,14 +116,42 @@ func determineStatusCodeFromLogicError(logic_error *handshakejslogic.LogicError)
 }
 
 func deliverAuthcodeEmail(email string, authcode string) {
+	subject := renderSubjectTemplate(authcode)
+	html := renderHtmlTemplate(authcode)
+
 	e := mail.NewEmail()
 	e.From = FROM
 	e.To = []string{email}
-	e.Subject = SUBJECT + authcode
-	e.HTML = []byte(BODY)
+	e.Subject = subject
+	e.HTML = []byte(html)
 
 	err := e.Send(SMTP_ADDRESS+":"+SMTP_PORT, smtp.PlainAuth("", SMTP_USERNAME, SMTP_PASSWORD, SMTP_ADDRESS))
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+func renderHtmlTemplate(authcode string) string {
+	data := mustache.Render(HTML_TEMPLATE, map[string]string{"authcode": authcode})
+
+	return data
+}
+
+func renderSubjectTemplate(authcode string) string {
+	data := mustache.Render(SUBJECT_TEMPLATE, map[string]string{"authcode": authcode})
+
+	return data
+}
+
+func loadEnvs() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	SMTP_ADDRESS = os.Getenv("SMTP_ADDRESS")
+	SMTP_PORT = os.Getenv("SMTP_PORT")
+	SMTP_USERNAME = os.Getenv("SMTP_USERNAME")
+	SMTP_PASSWORD = os.Getenv("SMTP_PASSWORD")
+	SUBJECT_TEMPLATE = os.Getenv("SUBJECT_TEMPLATE")
+	HTML_TEMPLATE = os.Getenv("HTML_TEMPLATE")
 }
