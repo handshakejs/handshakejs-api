@@ -3,13 +3,12 @@ package main
 import (
 	"github.com/go-martini/martini"
 	"github.com/handshakejs/handshakejslogic"
+	"github.com/handshakejs/handshakejstransport"
 	"github.com/hoisie/mustache"
 	"github.com/joho/godotenv"
-	mail "github.com/jordan-wright/email"
 	"github.com/martini-contrib/render"
 	"log"
 	"net/http"
-	"net/smtp"
 	"os"
 )
 
@@ -33,6 +32,7 @@ func main() {
 	loadEnvs()
 
 	handshakejslogic.Setup(REDIS_URL)
+	handshakejstransport.Setup(SMTP_ADDRESS, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD)
 
 	m := martini.Classic()
 	m.Use(martini.Logger())
@@ -102,7 +102,8 @@ func IdentitiesCreate(req *http.Request, r render.Render) {
 		statuscode := determineStatusCodeFromLogicError(logic_error)
 		r.JSON(statuscode, payload)
 	} else {
-		go deliverAuthcodeEmail(email, result["authcode"].(string))
+		deliverAuthcodeEmail(result)
+
 		payload := IdentitiesPayload(result)
 		r.JSON(200, payload)
 	}
@@ -117,38 +118,17 @@ func determineStatusCodeFromLogicError(logic_error *handshakejslogic.LogicError)
 	return code
 }
 
-func deliverAuthcodeEmail(email string, authcode string) {
-	subject := renderSubjectTemplate(authcode)
-	text := renderTextTemplate(authcode)
-	html := renderHtmlTemplate(authcode)
+func deliverAuthcodeEmail(identity map[string]interface{}) {
+	email := identity["email"].(string)
+	subject := renderTemplate(SUBJECT_TEMPLATE, identity)
+	text := renderTemplate(TEXT_TEMPLATE, identity)
+	html := renderTemplate(HTML_TEMPLATE, identity)
 
-	e := mail.NewEmail()
-	e.From = FROM
-	e.To = []string{email}
-	e.Subject = subject
-	e.Text = []byte(text)
-	e.HTML = []byte(html)
-
-	err := e.Send(SMTP_ADDRESS+":"+SMTP_PORT, smtp.PlainAuth("", SMTP_USERNAME, SMTP_PASSWORD, SMTP_ADDRESS))
-	if err != nil {
-		log.Println(err)
-	}
+	handshakejstransport.ViaEmail(email, FROM, subject, text, html)
 }
 
-func renderSubjectTemplate(authcode string) string {
-	data := mustache.Render(SUBJECT_TEMPLATE, map[string]string{"authcode": authcode})
-
-	return data
-}
-
-func renderTextTemplate(authcode string) string {
-	data := mustache.Render(TEXT_TEMPLATE, map[string]string{"authcode": authcode})
-
-	return data
-}
-
-func renderHtmlTemplate(authcode string) string {
-	data := mustache.Render(HTML_TEMPLATE, map[string]string{"authcode": authcode})
+func renderTemplate(template_string string, identity map[string]interface{}) string {
+	data := mustache.Render(template_string, identity)
 
 	return data
 }
