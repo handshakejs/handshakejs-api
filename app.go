@@ -19,18 +19,20 @@ const (
 )
 
 var (
+	REDIS_URL        string
 	SMTP_ADDRESS     string
 	SMTP_PORT        string
 	SMTP_USERNAME    string
 	SMTP_PASSWORD    string
 	SUBJECT_TEMPLATE string
+	TEXT_TEMPLATE    string
 	HTML_TEMPLATE    string
 )
 
 func main() {
 	loadEnvs()
 
-	handshakejslogic.Setup("redis://127.0.0.1:6379")
+	handshakejslogic.Setup(REDIS_URL)
 
 	m := martini.Classic()
 	m.Use(martini.Logger())
@@ -117,12 +119,14 @@ func determineStatusCodeFromLogicError(logic_error *handshakejslogic.LogicError)
 
 func deliverAuthcodeEmail(email string, authcode string) {
 	subject := renderSubjectTemplate(authcode)
+	text := renderTextTemplate(authcode)
 	html := renderHtmlTemplate(authcode)
 
 	e := mail.NewEmail()
 	e.From = FROM
 	e.To = []string{email}
 	e.Subject = subject
+	e.Text = []byte(text)
 	e.HTML = []byte(html)
 
 	err := e.Send(SMTP_ADDRESS+":"+SMTP_PORT, smtp.PlainAuth("", SMTP_USERNAME, SMTP_PASSWORD, SMTP_ADDRESS))
@@ -131,14 +135,20 @@ func deliverAuthcodeEmail(email string, authcode string) {
 	}
 }
 
-func renderHtmlTemplate(authcode string) string {
-	data := mustache.Render(HTML_TEMPLATE, map[string]string{"authcode": authcode})
+func renderSubjectTemplate(authcode string) string {
+	data := mustache.Render(SUBJECT_TEMPLATE, map[string]string{"authcode": authcode})
 
 	return data
 }
 
-func renderSubjectTemplate(authcode string) string {
-	data := mustache.Render(SUBJECT_TEMPLATE, map[string]string{"authcode": authcode})
+func renderTextTemplate(authcode string) string {
+	data := mustache.Render(TEXT_TEMPLATE, map[string]string{"authcode": authcode})
+
+	return data
+}
+
+func renderHtmlTemplate(authcode string) string {
+	data := mustache.Render(HTML_TEMPLATE, map[string]string{"authcode": authcode})
 
 	return data
 }
@@ -148,10 +158,12 @@ func loadEnvs() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	REDIS_URL = os.Getenv("REDIS_URL")
 	SMTP_ADDRESS = os.Getenv("SMTP_ADDRESS")
 	SMTP_PORT = os.Getenv("SMTP_PORT")
 	SMTP_USERNAME = os.Getenv("SMTP_USERNAME")
 	SMTP_PASSWORD = os.Getenv("SMTP_PASSWORD")
 	SUBJECT_TEMPLATE = os.Getenv("SUBJECT_TEMPLATE")
+	TEXT_TEMPLATE = os.Getenv("TEXT_TEMPLATE")
 	HTML_TEMPLATE = os.Getenv("HTML_TEMPLATE")
 }
