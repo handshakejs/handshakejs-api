@@ -92,7 +92,7 @@ I've tried to make it as easy to use as possible, but if you have any feedback p
 
 ### API Endpoint
 
-* https://handshakejs.herokuapp.com/api/v0
+* https://handshakejs.herokuapp.com/api/v1
 
 ## Apps
 
@@ -128,12 +128,22 @@ curl -X POST https://handshakejs.herokuapp.com/api/v0/apps/create.json \
 #### Example Response
 ```javascript
 {
-  success: true,
-  app: {
+  apps: [{
     email: "test@example.com",
     app_name: "myapp",
     salt: "the_default_generated_salt_that_you_should_keep_secret"
-  }
+  }]
+}
+```
+
+#### Example Error
+```javascript
+{
+  errors: [{
+    code: "not_unique",
+    field: "app_name",
+    message: "app_name must be unique"
+  }]
 }
 ```
 
