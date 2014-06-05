@@ -21,9 +21,7 @@ heroku config:set FROM=login@yourapp.com
 Next, create your first app.
 
 ```bash
-curl -X POST https://handshakejs.herokuapp.com/api/v0/apps/create.json \
--d "email=you@email.com" \
--d "app_name=your_app_name"
+https://handshakejs.herokuapp.com/api/v1/apps/create.json?email=[email]&app_name=[app_name]
 ```
 
 Nice, that's all it takes to get your authentication system running. Now let's plug that into our app using the embeddable JavaScript.
@@ -33,7 +31,7 @@ Place a script tag wherever you want the login form displayed.
 ```html
 <script src='/path/to/handshake.js' 
         data-app_name="your_app_name" 
-        data-root_url="https://handshakejs.herokuapp.com"></script>
+        data-root_url="https://handshakejs-api.herokuapp.com"></script>
 ```
 
 Get the latest [handshake.js here](https://github.com/sendgrid/handshakejs-script/blob/master/build/handshake.js). Replace the `data-app_name` with your own.
@@ -92,7 +90,7 @@ I've tried to make it as easy to use as possible, but if you have any feedback p
 
 ### API Endpoint
 
-* https://handshakejs.herokuapp.com/api/v1
+* https://handshakejs-api.herokuapp.com/api/v1
 
 ## Apps
 
@@ -105,7 +103,7 @@ Pass an email and app_name to create your app at handshakejs.herokuapp.com.
 #### Definition
 
 ```bash
-POST|GET https://handshakejs.herokuapp.com/api/v1/apps/create.json
+POST|GET https://handshakejs-api.herokuapp.com/api/v1/apps/create.json
 ```
 
 #### Required Parameters
@@ -120,7 +118,7 @@ POST|GET https://handshakejs.herokuapp.com/api/v1/apps/create.json
 #### Example Request
 
 ```bash
-https://handshakejs.herokuapp.com/api/v1/apps/create.json?app_name=[app_name]&email=[email]&salt=[salt]
+https://handshakejs-api.herokuapp.com/api/v1/apps/create.json?app_name=[app_name]&email=[email]&salt=[salt]
 ```
 
 #### Example Response
@@ -154,7 +152,7 @@ Request a login.
 #### Definition
 
 ```bash
-POST|GET https://handshakejs.herokuapp.com/api/v1/login/request.json
+POST|GET https://handshakejs-api.herokuapp.com/api/v1/login/request.json
 ```
 
 #### Required Parameters
@@ -165,7 +163,7 @@ POST|GET https://handshakejs.herokuapp.com/api/v1/login/request.json
 #### Example Request
 
 ```bash
-https://handshakejs.herokuapp.com/api/v0/login/request.json?email=[email]&app_name=[app_name]
+https://handshakejs-api.herokuapp.com/api/v0/login/request.json?email=[email]&app_name=[app_name]
 ```
 
 #### Example Response
@@ -197,7 +195,7 @@ Confirm a login. Email and authcode must match to get a success response back.
 #### Definition
 
 ```bash
-POST https://handshakejs.herokuapp.com/api/v0/login/confirm.json
+https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json
 ```
 
 #### Required Parameters
@@ -209,21 +207,27 @@ POST https://handshakejs.herokuapp.com/api/v0/login/confirm.json
 #### Example Request
 
 ```bash
-curl -X POST https://handshakejs.herokuapp.com/api/v0/login/confirm.json \
--d "email=test@example.com" \
--d "authcode=7389" \ 
--d "app_name=your_app_name"
+https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json?email=[email]&authcode=[authcode]&app_name=[app_name]
 ```
 
 #### Example Response
 ```javascript
 {
-  success: true,
-  identity: {
+  identities: [{
     email: "test@example.com",
-    app_name: "your_app_name",
-    authcode: "7389"
-  }
+    app_name: "your_app_name"
+  }]
+}
+```
+
+#### Example Error
+```javascript
+{
+  errors: [{
+    code: "not_found",
+    field: "app_name",
+    message: "app_name could not be found"
+  }]
 }
 ```
 

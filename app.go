@@ -31,7 +31,8 @@ var (
 func main() {
 	loadEnvs()
 
-	handshakejslogic.Setup(REDIS_URL)
+	logic_options := &handshakejslogic.Options{}
+	handshakejslogic.Setup(REDIS_URL, logic_options)
 	handshakejstransport.Setup(SMTP_ADDRESS, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD)
 
 	m := martini.Classic()
@@ -40,6 +41,7 @@ func main() {
 
 	m.Any("/api/v1/apps/create.json", AppsCreate)
 	m.Any("/api/v1/login/request.json", IdentitiesCreate)
+	m.Any("/api/v1/login/confirm.json", IdentitiesConfirm)
 
 	m.Run()
 }
@@ -61,13 +63,25 @@ func AppsPayload(app map[string]interface{}) map[string]interface{} {
 	return payload
 }
 
-func IdentitiesPayload(identity map[string]interface{}) map[string]interface{} {
+func IdentitiesCreatePayload(identity map[string]interface{}) map[string]interface{} {
 	email := identity["email"].(string)
 	app_name := identity["app_name"].(string)
 	authcode_expired_at := identity["authcode_expired_at"].(string)
 
 	identities := []interface{}{}
 	output_identity := map[string]interface{}{"email": email, "app_name": app_name, "authcode_expired_at": authcode_expired_at}
+	identities = append(identities, output_identity)
+	payload := map[string]interface{}{"identities": identities}
+
+	return payload
+}
+
+func IdentitiesConfirmPayload(identity map[string]interface{}) map[string]interface{} {
+	email := identity["email"].(string)
+	app_name := identity["app_name"].(string)
+
+	identities := []interface{}{}
+	output_identity := map[string]interface{}{"email": email, "app_name": app_name}
 	identities = append(identities, output_identity)
 	payload := map[string]interface{}{"identities": identities}
 
@@ -102,9 +116,27 @@ func IdentitiesCreate(req *http.Request, r render.Render) {
 		statuscode := determineStatusCodeFromLogicError(logic_error)
 		r.JSON(statuscode, payload)
 	} else {
-		deliverAuthcodeEmail(result)
+		go deliverAuthcodeEmail(result)
+		log.Println(result)
 
-		payload := IdentitiesPayload(result)
+		payload := IdentitiesCreatePayload(result)
+		r.JSON(200, payload)
+	}
+}
+
+func IdentitiesConfirm(req *http.Request, r render.Render) {
+	email := req.URL.Query().Get("email")
+	app_name := req.URL.Query().Get("app_name")
+	authcode := req.URL.Query().Get("authcode")
+
+	identity := map[string]interface{}{"email": email, "app_name": app_name, "authcode": authcode}
+	result, logic_error := handshakejslogic.IdentitiesConfirm(identity)
+	if logic_error != nil {
+		payload := ErrorPayload(logic_error)
+		statuscode := determineStatusCodeFromLogicError(logic_error)
+		r.JSON(statuscode, payload)
+	} else {
+		payload := IdentitiesConfirmPayload(result)
 		r.JSON(200, payload)
 	}
 }
