@@ -103,7 +103,7 @@ Pass an email and app_name to create your app at handshakejs.herokuapp.com.
 #### Definition
 
 ```bash
-POST|GET https://handshakejs-api.herokuapp.com/api/v1/apps/create.json
+ANY https://handshakejs-api.herokuapp.com/api/v1/apps/create.json?app_name=[app_name]&email=[email]&salt=[salt]
 ```
 
 #### Required Parameters
@@ -117,9 +117,7 @@ POST|GET https://handshakejs-api.herokuapp.com/api/v1/apps/create.json
 
 #### Example Request
 
-```bash
-https://handshakejs-api.herokuapp.com/api/v1/apps/create.json?app_name=[app_name]&email=[email]&salt=[salt]
-```
+<https://handshakejs-api.herokuapp.com/api/v1/apps/create.json?app_name=[app_name]&email=[email]&salt=[salt]>
 
 #### Example Response
 ```javascript
@@ -152,7 +150,7 @@ Request a login.
 #### Definition
 
 ```bash
-POST|GET https://handshakejs-api.herokuapp.com/api/v1/login/request.json
+ANY https://handshakejs-api.herokuapp.com/api/v0/login/request.json?email=[email]&app_name=[app_name]
 ```
 
 #### Required Parameters
@@ -162,9 +160,7 @@ POST|GET https://handshakejs-api.herokuapp.com/api/v1/login/request.json
 
 #### Example Request
 
-```bash
-https://handshakejs-api.herokuapp.com/api/v0/login/request.json?email=[email]&app_name=[app_name]
-```
+<https://handshakejs-api.herokuapp.com/api/v0/login/request.json?email=[email]&app_name=[app_name]>
 
 #### Example Response
 ```javascript
@@ -195,7 +191,7 @@ Confirm a login. Email and authcode must match to get a success response back.
 #### Definition
 
 ```bash
-https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json
+ANY https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json?email=[email]&authcode=[authcode]&app_name=[app_name]
 ```
 
 #### Required Parameters
@@ -206,9 +202,7 @@ https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json
 
 #### Example Request
 
-```bash
-https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json?email=[email]&authcode=[authcode]&app_name=[app_name]
-```
+<https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json?email=[email]&authcode=[authcode]&app_name=[app_name]>
 
 #### Example Response
 ```javascript
