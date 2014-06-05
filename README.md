@@ -124,10 +124,10 @@ https://handshakejs-api.herokuapp.com/api/v1/apps/create.json?app_name=[app_name
 #### Example Response
 ```javascript
 {
-  apps: [{
-    email: "test@example.com",
-    app_name: "myapp",
-    salt: "the_default_generated_salt_that_you_should_keep_secret"
+  "apps": [{
+    "email": "test@example.com",
+    "app_name": "myapp",
+    "salt": "the_default_generated_salt_that_you_should_keep_secret"
   }]
 }
 ```
@@ -136,9 +136,9 @@ https://handshakejs-api.herokuapp.com/api/v1/apps/create.json?app_name=[app_name
 ```javascript
 {
   errors: [{
-    code: "not_unique",
-    field: "app_name",
-    message: "app_name must be unique"
+    "code": "not_unique",
+    "field": "app_name",
+    "message": "app_name must be unique"
   }]
 }
 ```
@@ -169,10 +169,10 @@ https://handshakejs-api.herokuapp.com/api/v0/login/request.json?email=[email]&ap
 #### Example Response
 ```javascript
 {
-  identities: [{
-    email: "test@example.com",
-    app_name: "your_app_name",
-    authcode_expired_at: "1382833591309"
+  "identities": [{
+    "email": "test@example.com",
+    "app_name": "your_app_name",
+    "authcode_expired_at": "1382833591309"
   }]
 }
 ```
@@ -180,10 +180,10 @@ https://handshakejs-api.herokuapp.com/api/v0/login/request.json?email=[email]&ap
 #### Example Error
 ```javascript
 {
-  errors: [{
-    code: "not_found",
-    field: "app_name",
-    message: "app_name could not be found"
+  "errors": [{
+    "code": "not_found",
+    "field": "app_name",
+    "message": "app_name could not be found"
   }]
 }
 ```
@@ -213,9 +213,10 @@ https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json?email=[email]&au
 #### Example Response
 ```javascript
 {
-  identities: [{
-    email: "test@example.com",
-    app_name: "your_app_name"
+  "identities": [{
+    "email": "test@example.com",
+    "app_name": "your_app_name",
+    "hash": "523f325279fd3446a78894b55cf4d777"
   }]
 }
 ```
@@ -223,10 +224,10 @@ https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json?email=[email]&au
 #### Example Error
 ```javascript
 {
-  errors: [{
-    code: "not_found",
-    field: "app_name",
-    message: "app_name could not be found"
+  "errors": [{
+    "code": "not_found",
+    "field": "app_name",
+    "message": "app_name could not be found"
   }]
 }
 ```
