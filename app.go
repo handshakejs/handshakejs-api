@@ -79,9 +79,10 @@ func IdentitiesCreatePayload(identity map[string]interface{}) map[string]interfa
 func IdentitiesConfirmPayload(identity map[string]interface{}) map[string]interface{} {
 	email := identity["email"].(string)
 	app_name := identity["app_name"].(string)
+	hash := identity["hash"].(string)
 
 	identities := []interface{}{}
-	output_identity := map[string]interface{}{"email": email, "app_name": app_name}
+	output_identity := map[string]interface{}{"email": email, "app_name": app_name, "hash": hash}
 	identities = append(identities, output_identity)
 	payload := map[string]interface{}{"identities": identities}
 
