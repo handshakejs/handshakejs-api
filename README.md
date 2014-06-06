@@ -9,22 +9,22 @@
 ### Heroku
 
 ```bash
-git clone https://github.com/sendgrid/handshakejs-api.git
+git clone https://github.com/scottmotte/handshakejs-api.git
 cd handshakejs-api
-heroku create handshakejs
+heroku create handshakejs-api
 heroku addons:add sendgrid
 heroku addons:add redistogo
 git push heroku master
 heroku config:set FROM=login@yourapp.com
 ```
 
-Next, create your first app.
+Next, create your first app. Replace email and app_name with your information. 
 
-```bash
-https://handshakejs.herokuapp.com/api/v1/apps/create.json?email=[email]&app_name=[app_name]
-```
+<https://handshakejs-api.herokuapp.com/api/v1/apps/create.json?email=[email]&app_name=[app_name]>
 
 Nice, that's all it takes to get your authentication system running. Now let's plug that into our app using the embeddable JavaScript.
+
+### Old, this will move to a separate spot probably with instructions.
 
 Place a script tag wherever you want the login form displayed.  
 
