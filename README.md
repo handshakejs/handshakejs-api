@@ -1,6 +1,6 @@
 # [handshakejs](https://handshakejs.herokuapp.com) API Documentation
 
-![](https://rawgithub.com/handshakejs/handshakejs-script/master/handshakejs.svg)
+![](https://raw.githubusercontent.com/handshakejs/handshakejs-api/sm-go/handshakejs-logo.png)
 
 **API platform for authenticating users without requiring a password.**
 
