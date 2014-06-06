@@ -162,9 +162,9 @@ ANY https://handshakejs-api.herokuapp.com/api/v0/login/request.json?email=[email
 ```javascript
 {
   "errors": [{
-    "code": "not_found",
-    "field": "app_name",
-    "message": "app_name could not be found"
+    "code": "required",
+    "field": "email",
+    "message": "email cannot be blank"
   }]
 }
 ```
@@ -204,9 +204,9 @@ ANY https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json?email=[email
 ```javascript
 {
   "errors": [{
-    "code": "not_found",
-    "field": "app_name",
-    "message": "app_name could not be found"
+    "code": "incorrect",
+    "field": "authcode",
+    "message": "the authcode was incorrect"
   }]
 }
 ```
