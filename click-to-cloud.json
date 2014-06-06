@@ -1,8 +1,0 @@
-{
-  "heroku": [
-    "heroku create",
-    "heroku addons:add sendgrid",
-    "heroku addons:add redistogo",
-    "git push heroku master"
-  ]
-}

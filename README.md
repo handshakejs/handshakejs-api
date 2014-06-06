@@ -61,21 +61,6 @@ Then you'd setup a route in your app at /login/success to do something like this
   end
 ```
 
-### Click to cloud (beta)
-
-You can optionally install using `click-to-cloud`. Click to cloud is a binary I'm building to make it easier to deploy
-small application to cloud Paas like Heroku. I personally, use this approach, but your mileage may vary. 
-
-First, [install click-to-cloud](https://github.com/scottmotte/click-to-cloud#installation) on your machine.
-
-Second, run the following command.
-
-```bash
-click-to-cloud --repo https://github.com/sendgrid/handshakejs-api.git
-```
-
-That's it. That will install your application to Heroku.
-
 ## API Overview
 
 The [handshakejs.herokuapp.com](https://handshakejs.herokuapp.com) API is based around REST. It uses standard HTTP authentication. [JSON](https://www.json.org/) is returned in all responses from the API, including errors.
