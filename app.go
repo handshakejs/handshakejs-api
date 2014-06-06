@@ -113,6 +113,7 @@ func IdentitiesCreate(req *http.Request, r render.Render) {
 	app_name := req.URL.Query().Get("app_name")
 
 	identity := map[string]interface{}{"email": email, "app_name": app_name}
+	log.Println(identity)
 	result, logic_error := handshakejslogic.IdentitiesCreate(identity)
 	if logic_error != nil {
 		payload := ErrorPayload(logic_error)
