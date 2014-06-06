@@ -21,6 +21,8 @@ Note the REDISTOGOURL, SENGRID_PASSWORD, and SENDGRID_USERNAME.
 
 ```
 heroku config:set REDIS_URL=REDISTOGOURL
+heroku config:set REDIS_URL=REDISTOGOURL
+heroku config:set FROM=you@youremail.com
 heroku config:set SMTP_ADDRESS=smtp.sendgrid.net 
 heroku config:set SMTP_PORT=587
 heroku config:set SMTP_USERNAME=SENDGRID_USERNAME
