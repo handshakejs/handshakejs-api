@@ -169,10 +169,8 @@ func renderTemplate(template_string string, identity map[string]interface{}) str
 }
 
 func loadEnvs() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
+
 	REDIS_URL = os.Getenv("REDIS_URL")
 	FROM = os.Getenv("FROM")
 	SMTP_ADDRESS = os.Getenv("SMTP_ADDRESS")
