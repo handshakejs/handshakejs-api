@@ -11,11 +11,30 @@
 ```bash
 git clone https://github.com/scottmotte/handshakejs-api.git
 cd handshakejs-api
-heroku create handshakejs-api
+heroku create handshakejs-api -b https://github.com/kr/heroku-buildpack-go.git
 heroku addons:add sendgrid
 heroku addons:add redistogo
+heroku config
+```
+
+Note the REDISTOGOURL, SENGRID_PASSWORD, and SENDGRID_USERNAME.
+
+```
+heroku config:set REDIS_URL=REDISTOGOURL
+heroku config:set SMTP_ADDRESS=smtp.sendgrid.net 
+heroku config:set SMTP_PORT=587
+heroku config:set SMTP_USERNAME=SENDGRID_USERNAME
+heroku config:set SMTP_PASSWORD=SENDGRID_PASSWORD
+heroku config:set SUBJECT_TEMPLATE="Your code: {{authcode}}. Please enter it to login."
+heroku config:set TEXT_TEMPLATE="Your code: {{authcode}}. Please enter it to login."
+heroku config:set HTML_TEMPLATE="Your code: <b>{{authcode}}</b>. Please enter it to login."
+heroku config
+```
+
+Finally, deploy it.
+
+```
 git push heroku master
-heroku config:set FROM=login@yourapp.com
 ```
 
 Next, create your first app. Replace email and app_name with your information. 

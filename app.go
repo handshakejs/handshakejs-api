@@ -14,10 +14,10 @@ import (
 
 const (
 	LOGIC_ERROR_CODE_UNKNOWN = "unkown"
-	FROM                     = "login@handshakejs.com"
 )
 
 var (
+	FROM             string
 	REDIS_URL        string
 	SMTP_ADDRESS     string
 	SMTP_PORT        string
@@ -32,8 +32,10 @@ func main() {
 	loadEnvs()
 
 	logic_options := &handshakejslogic.Options{}
+	transport_options := &handshakejstransport.Options{SMTP_ADDRESS, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD}
+
 	handshakejslogic.Setup(REDIS_URL, logic_options)
-	handshakejstransport.Setup(SMTP_ADDRESS, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD)
+	handshakejstransport.Setup(transport_options)
 
 	m := martini.Classic()
 	m.Use(martini.Logger())
@@ -172,6 +174,7 @@ func loadEnvs() {
 		log.Fatal("Error loading .env file")
 	}
 	REDIS_URL = os.Getenv("REDIS_URL")
+	FROM = os.Getenv("FROM")
 	SMTP_ADDRESS = os.Getenv("SMTP_ADDRESS")
 	SMTP_PORT = os.Getenv("SMTP_PORT")
 	SMTP_USERNAME = os.Getenv("SMTP_USERNAME")
