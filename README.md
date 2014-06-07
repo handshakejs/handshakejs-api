@@ -231,14 +231,3 @@ ANY https://handshakejs-api.herokuapp.com/api/v1/login/confirm.json?email=[email
   }]
 }
 ```
-
-## Database Schema with Redis
-
-apps - collection of keys with all the app_names in there. SADD
-
-apps/myappname - hash with all the data in there. HSET or HMSET
-
-apps/theappname/identities - collection of keys with all the identities' emails in there. SADD
-
-apps/theappname/identities/emailaddress HSET or HMSET
-
