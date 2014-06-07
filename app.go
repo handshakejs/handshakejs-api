@@ -7,7 +7,6 @@ import (
 	"github.com/hoisie/mustache"
 	"github.com/joho/godotenv"
 	"github.com/martini-contrib/render"
-	"log"
 	"net/http"
 	"os"
 )
