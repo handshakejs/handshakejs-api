@@ -38,7 +38,6 @@ func main() {
 	handshakejstransport.Setup(transport_options)
 
 	m := martini.Classic()
-	m.Use(martini.Logger())
 	m.Use(render.Renderer())
 
 	m.Any("/api/v1/apps/create.json", AppsCreate)
