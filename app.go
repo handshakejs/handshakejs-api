@@ -30,8 +30,8 @@ var (
 func main() {
 	loadEnvs()
 
-	logic_options := &handshakejslogic.Options{}
-	transport_options := &handshakejstransport.Options{SMTP_ADDRESS, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD}
+	logic_options := handshakejslogic.Options{}
+	transport_options := handshakejstransport.Options{SmtpAddress: SMTP_ADDRESS, SmtpPort: SMTP_PORT, SmtpUsername: SMTP_USERNAME, SmtpPassword: SMTP_PASSWORD}
 
 	handshakejslogic.Setup(REDIS_URL, logic_options)
 	handshakejstransport.Setup(transport_options)
