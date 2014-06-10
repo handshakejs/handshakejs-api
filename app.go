@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/go-martini/martini"
+	"github.com/handshakejs/handshakejserrors"
 	"github.com/handshakejs/handshakejslogic"
 	"github.com/handshakejs/handshakejstransport"
 	"github.com/hoisie/mustache"
@@ -12,20 +13,24 @@ import (
 )
 
 const (
-	LOGIC_ERROR_CODE_UNKNOWN = "unkown"
+	LOGIC_ERROR_CODE_UNKNOWN = "unknown"
 )
 
 var (
-	DB_ENCRYPTION_SALT string
-	REDIS_URL          string
-	FROM               string
-	SMTP_ADDRESS       string
-	SMTP_PORT          string
-	SMTP_USERNAME      string
-	SMTP_PASSWORD      string
-	SUBJECT_TEMPLATE   string
-	TEXT_TEMPLATE      string
-	HTML_TEMPLATE      string
+	DB_ENCRYPTION_SALT   string
+	REDIS_URL            string
+	FROM                 string
+	SMTP_ADDRESS         string
+	SMTP_PORT            string
+	SMTP_USERNAME        string
+	SMTP_PASSWORD        string
+	BACKUP_SMTP_ADDRESS  string
+	BACKUP_SMTP_PORT     string
+	BACKUP_SMTP_USERNAME string
+	BACKUP_SMTP_PASSWORD string
+	SUBJECT_TEMPLATE     string
+	TEXT_TEMPLATE        string
+	HTML_TEMPLATE        string
 )
 
 func main() {
@@ -47,7 +52,7 @@ func main() {
 	m.Run()
 }
 
-func ErrorPayload(logic_error *handshakejslogic.LogicError) map[string]interface{} {
+func ErrorPayload(logic_error *handshakejserrors.LogicError) map[string]interface{} {
 	error_object := map[string]interface{}{"code": logic_error.Code, "field": logic_error.Field, "message": logic_error.Message}
 	errors := []interface{}{}
 	errors = append(errors, error_object)
@@ -118,10 +123,15 @@ func IdentitiesCreate(req *http.Request, r render.Render) {
 		statuscode := determineStatusCodeFromLogicError(logic_error)
 		r.JSON(statuscode, payload)
 	} else {
-		go deliverAuthcodeEmail(result)
-
-		payload := IdentitiesCreatePayload(result)
-		r.JSON(200, payload)
+		logic_error := deliverAuthcodeEmail(result)
+		if logic_error != nil {
+			payload := ErrorPayload(logic_error)
+			statuscode := determineStatusCodeFromLogicError(logic_error)
+			r.JSON(statuscode, payload)
+		} else {
+			payload := IdentitiesCreatePayload(result)
+			r.JSON(200, payload)
+		}
 	}
 }
 
@@ -142,7 +152,7 @@ func IdentitiesConfirm(req *http.Request, r render.Render) {
 	}
 }
 
-func determineStatusCodeFromLogicError(logic_error *handshakejslogic.LogicError) int {
+func determineStatusCodeFromLogicError(logic_error *handshakejserrors.LogicError) int {
 	code := 400
 	if logic_error.Code == LOGIC_ERROR_CODE_UNKNOWN {
 		code = 500
@@ -151,13 +161,28 @@ func determineStatusCodeFromLogicError(logic_error *handshakejslogic.LogicError)
 	return code
 }
 
-func deliverAuthcodeEmail(identity map[string]interface{}) {
+func deliverAuthcodeEmail(identity map[string]interface{}) *handshakejserrors.LogicError {
 	email := identity["email"].(string)
 	subject := renderTemplate(SUBJECT_TEMPLATE, identity)
 	text := renderTemplate(TEXT_TEMPLATE, identity)
 	html := renderTemplate(HTML_TEMPLATE, identity)
 
-	handshakejstransport.ViaEmail(email, FROM, subject, text, html)
+	logic_error := handshakejstransport.ViaEmail(email, FROM, subject, text, html)
+	if logic_error != nil {
+		if BACKUP_SMTP_ADDRESS != "" {
+			backup_transport_options := handshakejstransport.Options{SmtpAddress: BACKUP_SMTP_ADDRESS, SmtpPort: BACKUP_SMTP_PORT, SmtpUsername: BACKUP_SMTP_USERNAME, SmtpPassword: BACKUP_SMTP_PASSWORD}
+			handshakejstransport.Setup(backup_transport_options)
+
+			logic_error := handshakejstransport.ViaEmail(email, FROM, subject, text, html)
+			if logic_error != nil {
+				return logic_error
+			}
+		} else {
+			return logic_error
+		}
+	}
+
+	return nil
 }
 
 func renderTemplate(template_string string, identity map[string]interface{}) string {
@@ -176,6 +201,10 @@ func loadEnvs() {
 	SMTP_PORT = os.Getenv("SMTP_PORT")
 	SMTP_USERNAME = os.Getenv("SMTP_USERNAME")
 	SMTP_PASSWORD = os.Getenv("SMTP_PASSWORD")
+	BACKUP_SMTP_ADDRESS = os.Getenv("BACKUP_SMTP_ADDRESS")
+	BACKUP_SMTP_PORT = os.Getenv("BACKUP_SMTP_PORT")
+	BACKUP_SMTP_USERNAME = os.Getenv("BACKUP_SMTP_USERNAME")
+	BACKUP_SMTP_PASSWORD = os.Getenv("BACKUP_SMTP_PASSWORD")
 	SUBJECT_TEMPLATE = os.Getenv("SUBJECT_TEMPLATE")
 	TEXT_TEMPLATE = os.Getenv("TEXT_TEMPLATE")
 	HTML_TEMPLATE = os.Getenv("HTML_TEMPLATE")
