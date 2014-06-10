@@ -16,21 +16,22 @@ const (
 )
 
 var (
-	FROM             string
-	REDIS_URL        string
-	SMTP_ADDRESS     string
-	SMTP_PORT        string
-	SMTP_USERNAME    string
-	SMTP_PASSWORD    string
-	SUBJECT_TEMPLATE string
-	TEXT_TEMPLATE    string
-	HTML_TEMPLATE    string
+	DB_ENCRYPTION_SALT string
+	REDIS_URL          string
+	FROM               string
+	SMTP_ADDRESS       string
+	SMTP_PORT          string
+	SMTP_USERNAME      string
+	SMTP_PASSWORD      string
+	SUBJECT_TEMPLATE   string
+	TEXT_TEMPLATE      string
+	HTML_TEMPLATE      string
 )
 
 func main() {
 	loadEnvs()
 
-	logic_options := handshakejslogic.Options{}
+	logic_options := handshakejslogic.Options{DbEncryptionSalt: DB_ENCRYPTION_SALT}
 	transport_options := handshakejstransport.Options{SmtpAddress: SMTP_ADDRESS, SmtpPort: SMTP_PORT, SmtpUsername: SMTP_USERNAME, SmtpPassword: SMTP_PASSWORD}
 
 	handshakejslogic.Setup(REDIS_URL, logic_options)
@@ -168,6 +169,7 @@ func renderTemplate(template_string string, identity map[string]interface{}) str
 func loadEnvs() {
 	godotenv.Load()
 
+	DB_ENCRYPTION_SALT = os.Getenv("DB_ENCRYPTION_SALT")
 	REDIS_URL = os.Getenv("REDIS_URL")
 	FROM = os.Getenv("FROM")
 	SMTP_ADDRESS = os.Getenv("SMTP_ADDRESS")
