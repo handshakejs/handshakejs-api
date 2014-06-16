@@ -33,6 +33,12 @@ var (
 	HTML_TEMPLATE        string
 )
 
+func CrossDomain() martini.Handler {
+	return func(res http.ResponseWriter) {
+		res.Header().Add("Access-Control-Allow-Origin", "*")
+	}
+}
+
 func main() {
 	loadEnvs()
 
@@ -44,6 +50,7 @@ func main() {
 
 	m := martini.Classic()
 	m.Use(render.Renderer())
+	m.Use(CrossDomain())
 
 	m.Any("/api/v1/apps/create.json", AppsCreate)
 	m.Any("/api/v1/login/request.json", IdentitiesCreate)
