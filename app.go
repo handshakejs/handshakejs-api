@@ -7,6 +7,7 @@ import (
 	"github.com/handshakejs/handshakejstransport"
 	"github.com/hoisie/mustache"
 	"github.com/joho/godotenv"
+	"github.com/martini-contrib/binding"
 	"github.com/martini-contrib/render"
 	"net/http"
 	"os"
@@ -39,6 +40,18 @@ func CrossDomain() martini.Handler {
 	}
 }
 
+type App struct {
+	AppName string `form:"app_name"`
+	Email   string `form:"email"`
+	Salt    string `form:"salt"`
+}
+
+type Identity struct {
+	AppName  string `form:"app_name"`
+	Email    string `form:"email"`
+	Authcode string `form:"authcode"`
+}
+
 func main() {
 	loadEnvs()
 
@@ -52,9 +65,9 @@ func main() {
 	m.Use(render.Renderer())
 	m.Use(CrossDomain())
 
-	m.Any("/api/v1/apps/create.json", AppsCreate)
-	m.Any("/api/v1/login/request.json", IdentitiesCreate)
-	m.Any("/api/v1/login/confirm.json", IdentitiesConfirm)
+	m.Any("/api/v1/apps/create.json", binding.Form(App{}), AppsCreate)
+	m.Any("/api/v1/login/request.json", binding.Form(Identity{}), IdentitiesCreate)
+	m.Any("/api/v1/login/confirm.json", binding.Form(Identity{}), IdentitiesConfirm)
 
 	m.Run()
 }
@@ -102,13 +115,13 @@ func IdentitiesConfirmPayload(identity map[string]interface{}) map[string]interf
 	return payload
 }
 
-func AppsCreate(req *http.Request, r render.Render) {
-	email := req.URL.Query().Get("email")
-	app_name := req.URL.Query().Get("app_name")
-	salt := req.URL.Query().Get("salt")
+func AppsCreate(app App, req *http.Request, r render.Render) {
+	email := app.Email
+	app_name := app.AppName
+	salt := app.Salt
 
-	app := map[string]interface{}{"email": email, "app_name": app_name, "salt": salt}
-	result, logic_error := handshakejslogic.AppsCreate(app)
+	params := map[string]interface{}{"email": email, "app_name": app_name, "salt": salt}
+	result, logic_error := handshakejslogic.AppsCreate(params)
 	if logic_error != nil {
 		payload := ErrorPayload(logic_error)
 		statuscode := determineStatusCodeFromLogicError(logic_error)
@@ -119,12 +132,12 @@ func AppsCreate(req *http.Request, r render.Render) {
 	}
 }
 
-func IdentitiesCreate(req *http.Request, r render.Render) {
-	email := req.URL.Query().Get("email")
-	app_name := req.URL.Query().Get("app_name")
+func IdentitiesCreate(identity Identity, req *http.Request, r render.Render) {
+	email := identity.Email
+	app_name := identity.AppName
 
-	identity := map[string]interface{}{"email": email, "app_name": app_name}
-	result, logic_error := handshakejslogic.IdentitiesCreate(identity)
+	params := map[string]interface{}{"email": email, "app_name": app_name}
+	result, logic_error := handshakejslogic.IdentitiesCreate(params)
 	if logic_error != nil {
 		payload := ErrorPayload(logic_error)
 		statuscode := determineStatusCodeFromLogicError(logic_error)
@@ -142,13 +155,13 @@ func IdentitiesCreate(req *http.Request, r render.Render) {
 	}
 }
 
-func IdentitiesConfirm(req *http.Request, r render.Render) {
-	email := req.URL.Query().Get("email")
-	app_name := req.URL.Query().Get("app_name")
-	authcode := req.URL.Query().Get("authcode")
+func IdentitiesConfirm(identity Identity, req *http.Request, r render.Render) {
+	email := identity.Email
+	app_name := identity.AppName
+	authcode := identity.Authcode
 
-	identity := map[string]interface{}{"email": email, "app_name": app_name, "authcode": authcode}
-	result, logic_error := handshakejslogic.IdentitiesConfirm(identity)
+	params := map[string]interface{}{"email": email, "app_name": app_name, "authcode": authcode}
+	result, logic_error := handshakejslogic.IdentitiesConfirm(params)
 	if logic_error != nil {
 		payload := ErrorPayload(logic_error)
 		statuscode := determineStatusCodeFromLogicError(logic_error)
