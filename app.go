@@ -41,15 +41,15 @@ func CrossDomain() martini.Handler {
 }
 
 type App struct {
-	AppName string `form:"app_name"`
-	Email   string `form:"email"`
-	Salt    string `form:"salt"`
+	AppName string `form:"app_name" json:"app_name"`
+	Email   string `form:"email" json:"email"`
+	Salt    string `form:"salt" json:"salt"`
 }
 
 type Identity struct {
-	AppName  string `form:"app_name"`
-	Email    string `form:"email"`
-	Authcode string `form:"authcode"`
+	AppName  string `form:"app_name" json:"app_name"`
+	Email    string `form:"email" json:"email"`
+	Authcode string `form:"authcode" json:"authcode"`
 }
 
 func main() {
@@ -65,9 +65,9 @@ func main() {
 	m.Use(render.Renderer())
 	m.Use(CrossDomain())
 
-	m.Any("/api/v1/apps/create.json", binding.Form(App{}), AppsCreate)
-	m.Any("/api/v1/login/request.json", binding.Form(Identity{}), IdentitiesCreate)
-	m.Any("/api/v1/login/confirm.json", binding.Form(Identity{}), IdentitiesConfirm)
+	m.Any("/api/v1/apps/create.json", binding.Bind(App{}), AppsCreate)
+	m.Any("/api/v1/login/request.json", binding.Bind(Identity{}), IdentitiesCreate)
+	m.Any("/api/v1/login/confirm.json", binding.Bind(Identity{}), IdentitiesConfirm)
 
 	m.Run()
 }
