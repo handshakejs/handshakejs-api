@@ -1,0 +1,8 @@
+language: go
+
+go:
+  - tip
+
+install:
+  - go get -v github.com/stvp/tempredis
+  - go get -v ./...
