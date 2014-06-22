@@ -34,7 +34,7 @@
 		},
 		{
 			"ImportPath": "github.com/handshakejs/handshakejslogic",
-			"Rev": "6402b4f66a3ee92b3e9695f80aa253cf59c6733e"
+			"Rev": "4d83d2f99780f9409fa2fcb4ce18442ad427f814"
 		},
 		{
 			"ImportPath": "github.com/handshakejs/handshakejstransport",

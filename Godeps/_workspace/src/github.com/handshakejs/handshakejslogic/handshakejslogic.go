@@ -30,13 +30,14 @@ const (
 )
 
 var (
-	conn                      redis.Conn
 	DB_ENCRYPTION_SALT        string
 	AUTHCODE_LIFE_IN_MS       int64
 	AUTHCODE_LENGTH           int
 	KEY_EXPIRATION_IN_SECONDS int
 	PBKDF2_HASH_ITERATIONS    int
 	PBKDF2_HASH_BITES         int
+	redisurl                  redisurlparser.RedisURL
+	pool                      *redis.Pool
 )
 
 type Options struct {
@@ -48,7 +49,7 @@ type Options struct {
 	Pbkdf2HashBites        int
 }
 
-func Setup(redis_url string, options Options) {
+func Setup(redis_url_string string, options Options) {
 	if options.DbEncryptionSalt == "" {
 		log.Fatal("You must specify DbEncryptionSalt for security reasons")
 	} else {
@@ -85,22 +86,43 @@ func Setup(redis_url string, options Options) {
 
 	handshakejscrypter.Setup(DB_ENCRYPTION_SALT)
 
-	ru, err := redisurlparser.Parse(redis_url)
+	redisurl, err := redisurlparser.Parse(redis_url_string)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	conn, err = redis.Dial("tcp", ru.Host+":"+ru.Port)
-	if err != nil {
-		log.Fatal(err)
+	pool = &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", redisurl.Host+":"+redisurl.Port)
+			if err != nil {
+				log.Fatal(err)
+				return nil, err
+			}
+
+			if redisurl.Password != "" {
+				if _, err := c.Do("AUTH", redisurl.Password); err != nil {
+					c.Close()
+					log.Fatal(err)
+					return nil, err
+				}
+			}
+			return c, err
+		},
 	}
 
-	if ru.Password != "" {
-		if _, err := conn.Do("AUTH", ru.Password); err != nil {
-			conn.Close()
-			log.Fatal(err)
-		}
-	}
+	//c, err = redis.Dial("tcp", redisurl.Host+":"+redisurl.Port)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	//if redisurl.Password != "" {
+	//	if _, err := conn.Do("AUTH", redisurl.Password); err != nil {
+	//		conn.Close()
+	//		log.Fatal(err)
+	//	}
+	//}
 }
 
 func AppsCreate(app map[string]interface{}) (map[string]interface{}, *handshakejserrors.LogicError) {
@@ -183,6 +205,8 @@ func IdentitiesConfirm(identity map[string]interface{}) (map[string]interface{},
 		Authcode          string `redis:"authcode"`
 		AuthcodeExpiredAt string `redis:"authcode_expired_at"`
 	}
+
+	conn := Conn()
 	values, err := redis.Values(conn.Do("HGETALL", key))
 	if err != nil {
 		logic_error := &handshakejserrors.LogicError{"unknown", "", err.Error()}
@@ -275,6 +299,7 @@ func saveApp(key string, app map[string]interface{}) error {
 	for k, v := range app_to_save {
 		args = append(args, k, v)
 	}
+	conn := Conn()
 	_, err := conn.Do("HMSET", args...)
 	if err != nil {
 		return err
@@ -284,6 +309,7 @@ func saveApp(key string, app map[string]interface{}) error {
 }
 
 func addAppToApps(app_name string) error {
+	conn := Conn()
 	_, err := conn.Do("SADD", "apps", app_name)
 	if err != nil {
 		return err
@@ -293,6 +319,7 @@ func addAppToApps(app_name string) error {
 }
 
 func validateAppDoesNotExist(key string) error {
+	conn := Conn()
 	exists, err := redis.Bool(conn.Do("EXISTS", key))
 	if err != nil {
 		log.Printf("ERROR " + err.Error())
@@ -307,6 +334,7 @@ func validateAppDoesNotExist(key string) error {
 }
 
 func validateAppExists(key string) error {
+	conn := Conn()
 	exists, err := redis.Bool(conn.Do("EXISTS", key))
 	if err != nil {
 		log.Printf("ERROR " + err.Error())
@@ -321,6 +349,7 @@ func validateAppExists(key string) error {
 }
 
 func validateIdentityExists(key string) error {
+	conn := Conn()
 	res, err := conn.Do("EXISTS", key)
 	if err != nil {
 		log.Printf("ERROR " + err.Error())
@@ -334,6 +363,7 @@ func validateIdentityExists(key string) error {
 	return nil
 }
 func addIdentityToIdentities(app_name_key string, email string) error {
+	conn := Conn()
 	_, err := conn.Do("SADD", app_name_key+"/identities", email)
 	if err != nil {
 		log.Printf("ERROR " + err.Error())
@@ -358,6 +388,7 @@ func saveIdentity(key string, identity map[string]interface{}) error {
 	for k, v := range identity {
 		args = append(args, k, v)
 	}
+	conn := Conn()
 	_, err = conn.Do("HMSET", args...)
 	if err != nil {
 		log.Printf("ERROR " + err.Error())
@@ -431,7 +462,7 @@ func checkAuthcodePresent(identity map[string]interface{}) (string, *handshakejs
 }
 
 func Conn() redis.Conn {
-	return conn
+	return pool.Get()
 }
 
 func encrypt(text string) string {
